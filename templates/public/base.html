@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+        <title>{{get_app_name()}}</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="robots" content="index, follow">
+        <meta name="description" content="{{ get_app_description() }}">
+
+        <link rel="stylesheet" href="{{ url_for('static', filename='notyf/notyf.min.css') }}">
+        {% if session['shop-theme'] == 'dark'%}
+        <link rel="stylesheet" href="{{ url_for('static', filename='bulma/css/bulma.css') }}">
+        {% else %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='bulma/css/versions/bulma-no-dark-mode.min.css') }}">
+        {% endif %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='lineicons/css/icons.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='swiper/swiper-bundle.min.css') }}"/>
+        <script src="{{ url_for('static', filename='swiper/swiper-bundle.min.js.js') }}"></script>
+
+        <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+        <!-- PNG favicons for different resolutions -->
+        <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512x512.png">
+        <link rel="icon" type="image/png" sizes="256x256" href="/favicon-256x256.png">
+        <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
+        <link rel="icon" type="image/png" sizes="128x128" href="/favicon-128x128.png">
+        <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+        <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
+        <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+
+        <!-- Apple touch icons for iOS devices -->
+        <link rel="apple-touch-icon" sizes="512x512" href="/favicon-512x512.png">
+        <link rel="apple-touch-icon" sizes="256x256" href="/favicon-256x256.png">
+        <link rel="apple-touch-icon" sizes="192x192" href="/favicon-192x192.png">
+        <link rel="apple-touch-icon" sizes="128x128" href="/favicon-128x128.png">
+
+        <!-- Android / Chrome icons -->
+        <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
+        <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
+
+        {% block head %}{% endblock %}
+        <style>
+            html, body {
+                height: 100%;
+                margin: 0;
+            }
+            .page-wrapper {
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+            main.content {
+                flex: 1 0 auto;
+            }
+            footer.footer {
+                flex-shrink: 0;
+            }
+            .main-container {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+            }
+            .sidebar {
+                width: 100%;
+                position: relative;
+                top: 0;
+                height: auto;
+                overflow-y: visible;
+                margin-bottom: 2rem;
+            }
+            .content {
+                flex-grow: 1;
+                padding: 20px;
+            }
+
+
+            /* Tablet and desktop styles */
+            @media screen and (min-width: 769px) {
+                .main-container {
+                    flex-direction: row;
+                }
+                .sidebar {
+                    width: 300px;
+                    flex-shrink: 0;
+                    position: sticky;
+                    top: 5em;
+                    max-height: 50vh;
+                    overflow-y: auto;
+                    margin-bottom: 0;
+                }
+            }
+        </style>
+    </head>
+    <body class="is-light">
+        <!-- CONTENUTO PRINCIPALE -->
+        <div class="page-wrapper">
+            {%include 'public/shared/header.html'%}
+            <main class="section content">
+                <div class="container">
+                    {% block content %}
+                    <!-- Qui va il contenuto specifico di ogni pagina -->
+                    {% endblock %}
+                </div>
+            </main>
+
+            <!-- FOOTER -->
+            <!--TODO: aggiungere social e usare il nome presente nell'env-->
+            <footer class="footer py-5">
+                <div class="container">
+                    <div class="columns is-multiline is-vcentered">
+                        <!-- Copyright -->
+                        <div class="column is-full-mobile is-half-tablet has-text-centered has-text-left-tablet mb-4-mobile">
+                            <p class="has-text-grey">
+                            © 2025 {{session['settings']['header']['site_name']}}
+                            </p>
+                        </div>
+
+                        <!-- Policies -->
+                        <div class="column is-full-mobile is-half-tablet is-one-quarter-desktop has-text-centered has-text-left-tablet mb-4-mobile">
+                            <nav class="level is-mobile is-justify-content-center is-flex-wrap-wrap" role="navigation" aria-label="Policies">
+                            <a href="{{ url_for('public.cookies') }}" class="has-text-link has-underline" aria-label="Cookie policy">
+                                {{ _('Cookie policy') }}
+                            </a>
+                            <a href="{{ url_for('public.privacy_policy') }}" class="has-text-link has-underline" aria-label="Privacy policy">
+                                {{ _('Privacy policy') }}
+                            </a>
+                            </nav>
+                        </div>
+
+                        <!-- Social Links -->
+                        <!--TODO: aggiungere i link social-->
+                        <div class="column is-full-mobile is-half-tablet is-one-quarter-desktop has-text-centered has-text-left-tablet">
+                            <nav class="level is-mobile is-justify-content-center" aria-label="Social media">
+                            {% if session['settings']['social']['instagram_profile_url']: %}
+                            <a href="{{session['settings']['social']['instagram_profile_url']}}" class="has-text-link" aria-label="Instagram" target="_blank" rel="noopener">
+                                <i class="lni lni-instagram" style="font-size: 1.5rem;"></i>
+                            </a>
+                            {% endif %}
+                            {% if session['settings']['social']['tiktok_profile_url']: %}
+                            <a href="{{session['settings']['social']['tiktok_profile_url']}}" class="has-text-link" aria-label="TikTok" target="_blank" rel="noopener">
+                                <i class="lni lni-tiktok" style="font-size: 1.5rem;"></i>
+                            </a>
+                            {% endif %}
+                            {% if session['settings']['social']['youtube_profile_url']: %}
+                            <a href="{{session['settings']['social']['youtube_profile_url']}}" class="has-text-link" aria-label="YouTube" target="_blank" rel="noopener">
+                                <i class="lni lni-youtube" style="font-size: 1.5rem;"></i>
+                            </a>
+                            {% endif %}
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+
+
+        </div>
+
+        <!-- Cookie Consent Banner-->
+        <div id="cookie-banner" class="notification is-info is-flex is-justify-content-space-between is-align-items-center p-4" style="display: none; position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 -2px 8px rgba(0,0,0,0.1);">
+            <div id="cookie-banner" class="notification is-info p-4" style="position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 -2px 8px rgba(0,0,0,0.1);">
+                <div class="content is-flex is-justify-content-space-between is-align-items-center">
+                    <p class="mb-0">
+                        {{_('This website uses essential cookies to ensure its proper functioning. By continuing to browse, you accept their use.')}}
+                        <a href="{{ url_for('public.cookies') }}" class="has-text-link has-underline">{{_('Learn more')}}</a>.
+                    </p>
+                    <button id="close-cookie-banner" class="button is-small ml-4">{{_('Close')}}</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCRIPT -->
+        <script src="{{ url_for('static', filename='masonry/masonry.pkgd.min.js') }}"></script>
+        {% include 'shared/js/shared.html' %}
+        <script src="{{ url_for('static', filename='js/form_manager.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/modal_manager.js') }}"></script>
+        {% include 'shared/js/cart_manager.html' %}
+        <script src="{{ url_for('static', filename='notyf/notyf.min.js.js') }}"></script>
+        <script>
+            window.notyf = new Notyf();
+        </script>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', () => {
+                const banner = document.getElementById('cookie-banner');
+                const closeBtn = document.getElementById('close-cookie-banner');
+                const cookieName = 'cookieConsentGiven';
+
+                function getCookie(name) {
+                    const value = `; ${document.cookie}`;
+                    const parts = value.split(`; ${name}=`);
+                    if (parts.length === 2) return parts.pop().split(';').shift();
+                }
+
+                if (getCookie(cookieName)) {
+                    banner.remove()
+                }
+
+                closeBtn.addEventListener('click', () => {
+                    const d = new Date();
+                    d.setTime(d.getTime() + (6 * 30 * 24 * 60 * 60 * 1000)); // 6 months
+                    const expires = "expires=" + d.toUTCString();
+                    document.cookie = `${cookieName}=true; ${expires}; path=/; SameSite=Lax`;
+                    banner.remove();
+                });
+            });
+        </script>
+        {% block scripts %}{% endblock %}
+    </body>
+</html>

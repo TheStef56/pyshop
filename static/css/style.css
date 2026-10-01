@@ -1,0 +1,271 @@
+
+.grid-item {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.2s ease;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    aspect-ratio: 3 / 4;
+}
+
+.swiper {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+}
+
+.swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 250px; /* Altezza fissa per le slide */
+    background: white;
+}
+
+.swiper-slide:not([aria-label="1 / 1"]) {
+    cursor: grab;
+}
+/* Grid responsive con CSS Grid */
+.responsive-grid {
+    display: grid;
+    gap: 1rem;
+    /* Mobile: 1 colonna */
+    grid-template-columns: 1fr;
+}
+
+.color-switcher {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;   
+    margin-right: 0.5em;      /* Rende il div un cerchio */
+    text-decoration: none;
+}
+
+/* Tablet: 2 colonne */
+@media screen and (min-width: 320px) {
+    .responsive-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid-item > * > b {
+        font-size: 12px;
+    }
+
+    .grid-item {
+        background: white;
+        border-radius: 16px;
+        aspect-ratio: 3 / 7;
+    }
+
+}
+
+/* Tablet: 2 colonne */
+@media screen and (min-width: 450px) {
+    .responsive-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid-item > * > b {
+        font-size: 14px;
+    }
+
+    .grid-item {
+        background: white;
+        border-radius: 16px;
+        aspect-ratio: 3 / 4;
+    }
+}
+
+/* Desktop: 4 colonne */
+@media screen and (min-width: 1200px) {
+    .responsive-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.swiper-slide img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+    width: 100%;
+    height: 99%;
+    border-radius: 12px;
+}
+
+.mansory-item-button {
+    transition: transform 0.2s ;
+}
+
+.mansory-item-button:hover {
+    transform: translate(0,-4px)
+}
+
+.has-background-secondary {
+    background: hsl(var(--bulma-scheme-h),var(--bulma-scheme-s),calc(var(--bulma-scheme-main-l) + var(--background-offset)))!important;
+}
+
+/*  */
+.panel,
+.gridjs-tbody,
+td.gridjs-td,
+th.gridjs-th,
+.box,
+.card,
+.has-background-secondary-lighter {
+    background: var(--bulma-scheme-main-bis);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.gridjs-tbody {
+    color: var(--bulma-label-color);
+}
+
+.heading {
+    user-select: none;
+}
+
+#confirm-delete-btn,
+#confirm-save-btn
+{
+    margin-right: 10px;
+}
+
+ol {
+    list-style: decimal;
+}
+
+ul  {
+    list-style: circle;  
+}
+
+.menu-list {
+    list-style: none;
+}
+
+.category-item {
+    list-style: none;
+}
+
+.label-item {
+    list-style: none;
+}
+
+.subcategory-list {
+    list-style: none;
+}
+
+.subcategory-list > li {
+    list-style: none;
+}
+
+.pell-content  {
+    padding:2em
+}
+
+td.gridjs-td {
+    border-color: var(--bulma-background) !important;
+}
+
+th.gridjs-th {
+    border-color: var(--bulma-background) !important;
+}
+
+.choices__inner {
+    background-color: var(--bulma-background) !important;
+    border: none !important;
+}
+
+.choices__input {
+    background-color: var(--bulma-background) !important;
+    color: var(--bulma-label-color)
+}
+
+.choices__list--dropdown .choices__item--selectable.is-highlighted, .choices__list[aria-expanded]{
+    background-color: var(--bulma-background) !important;
+    border: none;
+}
+
+.choices__list--dropdown .choices__item--selectable.is-highlighted, .choices__list[aria-expanded] .choices__item--selectable.is-highlighted {
+    background-color: var(--bulma-primary) !important;
+    color: var(--bulma-light);
+    border: none;
+}
+
+.pell-actionbar {
+    background-color : var(--bulma-background) !important;
+}
+
+.jstree-default .jstree-wholerow-clicked {
+    background: var(--bulma-background) !important;
+}
+
+.jstree-hovered {
+    background: var(--bulma-background) !important;
+}
+
+.jstree-wholerow-hovered {
+    background: var(--bulma-background) !important;
+}
+
+.jstree-contextmenu {
+    background-color: var(--bulma-background) !important;
+    border-radius: 1.2em;
+    border-color: var(--bulma-label-color);
+}
+
+.jstree-contextmenu > li > ul {
+    border-radius: 1.2em;
+    background-color: var(--bulma-background) !important;
+}
+
+.vakata-context .vakata-context-hover > a {
+    background-color: var(--bulma-scheme-main-bis) !important;
+    border-radius: 1.2em;
+}
+
+.vakata-context li > a {
+    text-shadow: none !important;
+    color: var(--bulma-label-color) !important;
+}
+
+.vakata-context li > a:hover {
+    background-color: var(--bulma-scheme-main-bis) !important;
+    border-radius: 1.2em;
+}
+
+.vakata-context, .vakata-context ul {
+    box-shadow: none !important;
+    border: 2px solid var(--bulma-scheme-main-bis) !important;
+}
+
+.vakata-contextmenu-sep {
+    border-left: 1px solid var(--bulma-scheme-main-bis) !important;
+}
+
+.vakata-context .vakata-context-separator > a, .vakata-context .vakata-context-separator > a:hover {
+    border-top: none !important;
+}
+
+.vakata-context-separator {
+    display: none;
+}
+
+.swiper-slide {
+    background: var(--bulma-scheme-main-bis) !important;
+}
+
+.grid-item {
+    background: var(--bulma-scheme-main-bis) !important;
+}
+
+.vertical-hr {
+    background-color: var(--bulma-hr-background-color);
+    padding: 2px;
+    margin: 0px 20px 0px 20px;
+    border-radius: 2px;
+}

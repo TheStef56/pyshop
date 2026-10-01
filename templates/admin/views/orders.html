@@ -1,0 +1,347 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Ordini{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="title"><i class="lni lni-agenda"></i> Ordini</h1>
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <div class="dropdown" id="multiSelectDropdown">
+                    <div class="dropdown-trigger">
+                    <button class="button select" aria-haspopup="true" aria-controls="dropdown-menu">
+                        <span>Stato ordine</span>
+                        <span class="icon is-small">
+                        <i class="fas fa-angle-down" aria-hidden="true"></i>
+                        </span>
+                    </button>
+                    </div>
+                    <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                    <div class="dropdown-content">
+                        {% for s in status %}
+                        <label class="dropdown-item">
+                        <input type="checkbox" class="status" value="{{s.value}}" checked="true"> {{ status_translate[s] }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                    </div>
+                </div> 
+            </div>
+            <div class="level-item">
+                <div class="select">
+                    <select id="per_page">
+                        <option value="10">10 per pagina</option>
+                        <option value="25">25 per pagina</option>
+                        <option value="50">50 per pagina</option>
+                        <option value="100">100 per pagina</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <button type="button" id="group-bp-button" class="button is-primary" onclick="groupByProducts(1)">
+                    Raggruppa ordini per prodotto
+                </button>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <button type="button" class="button is-primary" onclick="fetchInvoicesByStatus()">
+                    <i class="lni lni-download-1 lni-lg pr-1"></i>Scarica fatture per stato
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {% set modal_title = 'Elimina ordine' %}
+    {% set modal_id = 'confirm-delete-modal'%}
+    {% set modal_body = '
+        <p>Sei sicuro di voler cancellare l\'elemento?</p>
+    '%}
+    {% set modal_footer = '
+        <button id="confirm-delete-btn" class="button is-success">Conferma</button>
+        <button class="button" trigger="modal" modal="#confirm-delete-modal" type="button">Annulla</button>
+    '%}
+    {% include "shared/modal.html" %}
+    
+    <div id="orders"></div>
+    
+    <nav class="pagination is-centered mt-4" role="navigation" aria-label="pagination">
+        <ul class="pagination-list" id="pagination"></ul>
+    </nav>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+</body>
+<script type="text/javascript">
+let currentPage = 1;
+let pageFunc = "reloadOrdersTable";
+let reloadFunc = reloadOrdersTable;
+
+async function reloadOrdersTable(page = 1) {
+    currentPage = page;
+    const perPage = document.getElementById('per_page').value;
+    let checkboxes = document.querySelectorAll('.status');
+    let mask = 0;
+    let inc = 1;
+    for (let x = 0; x < checkboxes.length; x++) {
+        if (checkboxes[x].checked) { mask += inc}
+        inc = inc << 1;
+    }
+
+    const response = await fetch(`/admin/orders/list?status=${mask}&page=${page}&per_page=${perPage}&group=false`, {
+        method: "GET",
+    });
+    
+    if (response.status == 200) {
+        const json = await response.json();
+        ( { data, pagination } = json);
+        
+        if (window.ordersGrid) {
+            window.ordersGrid.destroy();
+        }
+        document.getElementById("orders").innerHTML = "";
+        
+        window.ordersGrid = new gridjs.Grid({
+            columns: [
+                {
+                    name: 'Data',
+                    id: 'created_at',
+                    formatter: ((cell) => {
+                        return cell.split('T')[0];
+                    }),
+                    attributes: (() => {
+                        return {
+                            style: "width: 131px"
+                        }
+                    })
+                },
+                {
+                    name: 'Stato',
+                    id: 'translated_status',
+                },
+                {
+                    name: 'Pagato',
+                    id: 'payed',
+                    formatter: (cell) => cell ? '✅' : '❌'
+                },
+                {
+                    name: 'ID',
+                    id: 'id'
+                },
+                {
+                    name: 'Azioni',
+                    formatter: (_, row) => {
+                        const id = row.cells[0].data;
+                        return gridjs.html(`
+                            <a class="button is-info mr-2" href="/admin/order/${id}/edit"><i class="lni lni-pencil-1 pr-1"></i> Modifica</a>
+                            <a class="button is-primary" href="javascript:fetchInvoice(${id})"><i class="lni lni-download-1 pr-1"></i>Fattura</a>
+                            <button type="button" class="button is-danger" onclick=javascript:showConfirmDelete(${id})><i class="lni lni-trash-3"></i> Delete</button>
+                        `);
+                    }
+                }
+            ],
+            data: data
+        }).render(document.getElementById('orders'));
+        
+        // Update pagination
+        updatePagination(pagination);
+    }
+}
+
+async function resetGroupButton() {
+    reloadOrdersTable(1);
+    const bt = document.getElementById("group-bp-button");
+    bt.innerText = "Raggruppa ordini per prodotto";
+    bt.onclick = () => {groupByProducts(1)};
+    pageFunc = "reloadOrdersTable";
+    reloadFunc = reloadOrdersTable;
+
+}
+
+async function groupByProducts(page = 1){
+    pageFunc = "groupByProducts";
+    reloadFunc = groupByProducts;
+
+    currentPage = page;
+    const perPage = document.getElementById('per_page').value;
+    let checkboxes = document.querySelectorAll('.status');
+    let mask = 0;
+    let inc = 1;
+    for (let x = 0; x < checkboxes.length; x++) {
+        if (checkboxes[x].checked) { mask += inc}
+        inc = inc << 1;
+    }
+
+    const response = await fetch(`/admin/orders/list?status=${mask}&page=${page}&per_page=${perPage}&group=true`, {
+        method: "GET",
+    });
+    
+    if (response.status == 200) {
+        const json = await response.json();
+        ( { data, pagination } = json);
+
+        if (window.ordersGrid) {
+            window.ordersGrid.destroy();
+        }
+        document.getElementById("orders").innerHTML = "";
+        
+        window.ordersGrid = new gridjs.Grid({
+            columns: [
+            {
+                name: 'ID prodotto',
+                id: 'product_id'
+            },
+            {
+                name: 'ID variante',
+                id: 'id'
+            },
+            {
+                name: 'Nome prodotto',
+                id: 'product_name',
+            },
+            {
+                name: 'Nome variante',
+                id: 'main_name',
+            },
+            {
+                name: 'Quantità ordinata',
+                id: 'order_count',
+            }
+            ],
+            data: data
+        }).render(document.getElementById('orders'));
+        const bt = document.getElementById("group-bp-button");
+        bt.innerText = "Mostra ordini singolarmente";
+        bt.onclick = resetGroupButton;
+    }
+    updatePagination(pagination);
+}
+
+function updatePagination(p) {
+    const paginationList = document.getElementById('pagination');
+    paginationList.innerHTML = '';
+    
+    // Previous page
+    if (p.page > 1) {
+        paginationList.innerHTML += `
+            <li>
+                <a class="pagination-link" aria-label="Goto page ${p.page - 1}" 
+                   onclick="${pageFunc}(${p.page - 1})">
+                    <span class="icon"><i class="lni lni-chevron-left"></i></span>
+                </a>
+            </li>
+        `;
+    }
+    
+    // Page numbers
+    for (let i = 1; i <= p.pages + 1; i++) {
+        if (
+            i === 1 || 
+            i === p.pages || 
+            (i >= p.page - 2 && i <= p.page + 2)
+        ) {
+            paginationList.innerHTML += `
+                <li>
+                    <a class="pagination-link ${i === p.page ? 'is-current' : ''}" 
+                       aria-label="Goto page ${i}"
+                       onclick="${pageFunc}(${i})">
+                        ${i}
+                    </a>
+                </li>
+            `;
+        } else if (
+            i === p.page - 3 || 
+            i === p.page + 3
+        ) {
+            paginationList.innerHTML += `
+                <li><span class="pagination-ellipsis">&hellip;</span></li>
+            `;
+        }
+    }
+    
+    // Next page
+    if (p.page < p.pages) {
+        paginationList.innerHTML += `
+            <li>
+                <a class="pagination-link" aria-label="Goto page ${p.page + 1}" 
+                   onclick="${pageFunc}(${p.page + 1})">
+                    <span class="icon"><i class="lni lni-chevron-left" style="rotate:180deg"></i></span>
+                </a>
+            </li>
+        `;
+    }
+}
+
+async function fetchInvoicesByStatus() {
+    response = await fetch("/admin/orders/download-invoice?status=" + document.getElementById('status').value , {
+        method: "GET",
+    })
+    if (response.status !== 200) {
+        window.notyf.error('Un errore ha impedito il download delle fatture');
+        return;
+    }
+    const blob = await response.blob();
+    const contentDisposition = response.headers.get("Content-Disposition");
+    let filename = "fatture.zip";  // fallback
+    if (contentDisposition && contentDisposition.includes("filename=")) {
+        const match = contentDisposition.match(/filename="?(.+?)"?$/);
+        if (match && match[1]) {
+            filename = match[1];
+        }
+    }
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    reloadOrdersTable(1);
+    document.getElementsByClassName("dropdown-content")[0].addEventListener('change', () => reloadFunc(1));
+    document.getElementById('per_page').addEventListener('change', () => reloadFunc(1));
+});
+
+function showConfirmDelete(id) {
+    openModal('confirm-delete-modal')
+    document.getElementById('confirm-delete-btn').setAttribute('onclick', `deleteOrder("${id}")`);
+}
+
+async function  deleteOrder(id) {
+    response = await fetch(`/admin/order/${id}/delete`, {
+        method: "DELETE"
+    })
+    if (response.status == 200) {
+        window.notyf.success('Ordine eliminato correttamente');
+        closeModal('confirm-delete-modal')
+    } else {
+        window.notyf.error('Un errore ha impedito la cancellazione dell\'ordine')
+    }
+    reloadOrdersTable();
+}
+
+const dropdown = document.getElementById('multiSelectDropdown');
+const trigger = dropdown.querySelector('.dropdown-trigger');
+
+trigger.addEventListener('click', () => {
+    dropdown.classList.toggle('is-active');
+});
+
+document.addEventListener('click', (event) => {
+    if (!dropdown.contains(event.target)) {
+    dropdown.classList.remove('is-active');
+    }
+});
+
+</script>
+{% include 'admin/views/orders/javascript.html'%}
+{% endblock %}

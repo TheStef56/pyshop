@@ -1,0 +1,150 @@
+{% extends "public/base.html" %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="title is-3 has-text-centered mb-6">{{ _('Order Summary') }}</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mb-5">
+                {% for category, message in messages %}
+                    <div class="notification is-{{ category }} mb-2">
+                    {{ message }}
+                    </div>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="columns is-multiline">
+            <!-- Products Section -->
+            <div class="column is-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-header-title">{{ _('Your Products') }}</h2>
+                    </div>
+                    <div class="card-content">
+                        {% for identifier in product_variants %}
+                            {% set product = product_variants[identifier]['product'] %}
+                            {% set variant = product_variants[identifier]['variant'] %}
+                            <div id="product_{{variant.id}}" class="media mb-5">
+                                <figure class="media-left">
+                                    <p class="image is-128x128" style="height: fit-content;">
+                                        <img src="{{ variant.first_image()['path'] }}" alt="{{product.name[session['lang']]}}">
+                                    </p>
+                                </figure>
+                                <div class="media-content">
+                                    <h3 class="title is-5 mb-1">
+                                        {{ product.name[session['lang']] }}
+                                        {% if variant.name != {} %}- {{ variant.name[session['lang']] }}{% endif %}
+                                        
+                                        {% if variant.get_discount(session, variant.option) | float != 0.0 %}
+                                            <span class="tag is-danger is-light ml-2">-{{ variant.get_discount(session, variant.option) }}%</span>
+                                        {% endif %}
+                                    </h3>
+
+                                    {% if variant.get_discount(session, variant.option) | float != 0.0 %}
+                                        <p class="mb-2">
+                                            <strong>{{ _('Unit price') }}:</strong>
+                                            <s class="mr-2">{{ variant.get_original_price(session, 1, variant.option) }}</s>
+                                            <span class="has-text-danger">{{ variant.get_price(session, 1, variant.option) }}</span>
+                                        </p>
+                                    {% else %}
+                                        <p class="mb-2">
+                                            <strong>{{ _('Unit price') }}:</strong> {{ variant.get_price(session, 1, variant.option) }}
+                                        </p>
+                                    {% endif %}
+
+                                    <p class="mb-2">
+                                        <strong>{{ _('Quantity') }}:</strong> {{ product_variants[identifier].quantity }}
+                                    </p>
+
+                                    <p class="has-text-weight-semibold">
+                                        {{ _('Subtotal') }}:
+                                        {% if variant.get_discount(session, variant.option) | float != 0.0 %}
+                                            <s class="mr-2">{{ variant.get_original_price(session, product_variants[identifier].quantity, variant.option) }}</s>
+                                            <span class="has-text-danger">{{ variant.get_price(session, product_variants[identifier].quantity, variant.option) }}</span>
+                                        {% else %}
+                                            {{ variant.get_price(session, product_variants[identifier].quantity, variant.option) }}
+                                        {% endif %}
+                                    </p>
+
+                                </div>
+                            </div>
+                            {% if not loop.last %}<hr>{% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary Section -->
+            <div class="column is-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-header-title">{{ _('Order Details') }}</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="content">
+                            <h4 class="title is-6">DAYS</h4>
+                            <p>{{ get_processing_time() }} {{ _('DAYS') }} </p>
+                            <h4 class="title is-6">{{ _('Shipping Method') }}</h4>
+                            <p>{{ packlink.shipping_time }} - {{ packlink.display_price }}</p>
+
+                            <h4 class="title is-6 mt-4">{{ _('Total') }}</h4>
+                            <p class="has-text-weight-bold is-size-4">{{ total_price }} <small style="font-size: 0.5em;">({{_('with VAT')}})</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Billing and Shipping Information -->
+        <div class="columns is-multiline mt-5">
+            <!-- Billing Address -->
+            <div class="column is-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-header-title">{{ _('Billing Information') }}</h2>
+                    </div>
+                    <div class="card-content">
+                        <address>
+                            <p>{{session['checkout_data']['billing_name']}} {{session['checkout_data']['billing_lastname']}}</p>
+                            <p>{{session['checkout_data']['billing_street']}}, {{session['checkout_data']['billing_number']}}</p>
+                            <p>{{session['checkout_data']['billing_postal_code']}} {{session['checkout_data']['billing_city']}}</p>
+                            <p>{{session['checkout_data']['billing_email']}}</p>
+                            <p>{{session['checkout_data']['billing_phone']}}</p>
+                            {% if session['checkout_data']['billing_fiscal_code'] %}
+                                <p>{{ _('Tax Code') }}: {{session['checkout_data']['billing_fiscal_code']}}</p>
+                            {% endif %}
+                        </address>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipping Address -->
+            <div class="column is-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-header-title">{{ _('Shipping Information') }}</h2>
+                    </div>
+                    <div class="card-content">
+                        <address>
+                            <p>{{session['checkout_data']['shipping_name']}} {{session['checkout_data']['shipping_lastname']}}</p>
+                            <p>{{session['checkout_data']['shipping_street']}} {{session['checkout_data']['shipping_number']}}</p>
+                            <p>{{session['checkout_data']['shipping_postal_code']}} {{session['checkout_data']['shipping_city']}}</p>
+                            <p>{{session['checkout_data']['shipping_region']}}, {{session['checkout_data']['shipping_country']}}</p>
+                        </address>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment and Confirmation -->
+        <div class="has-text-centered mt-6">
+            <a class="button is-primary is-large" href="{{url_for('public.paypal_pay')}}"><i class="lni lni-paypal"></i> {{ _('Pay with Paypal') }}</a>
+            <a href="{{ url_for('public.checkout') }}" class="button is-text ml-3">{{ _('Back to Checkout') }}</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

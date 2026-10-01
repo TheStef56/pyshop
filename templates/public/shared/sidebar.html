@@ -1,0 +1,461 @@
+
+
+{%if relevance %}
+<div id="per_page-div" class="mb-5 select">
+    <select id="per_page">
+        <option value="9">{{_('9 per page')}}</option>
+        <option value="15">{{_('15 per page')}}</option>
+        <option value="30">{{_('30 per page')}}</option>
+    </select>
+</div>
+<div id="order_by-div" class="mb-5 select">
+  <select id="order">
+    <option value="">{{_('Relevance')}}</option>
+    <option {% if request.args.get('order', '') == 'best_price' %} selected {% endif %} value="best_price">{{_('Best price')}}</option>
+    <option {% if request.args.get('order', '') == 'best_discount' %} selected {% endif %} value="best_discount">{{_('Best discount')}}</option>
+  </select>
+</div>
+{% endif %}
+<!-- Search input -->
+<div id="search-div" class="mb-5">
+    <div id="resize-search" style="position: relative;">
+        <input id="search" class="input" type="text" placeholder="Search...">
+        <i id="search-icon" class="lni {% if request.args.get('q') == None %} lni-search-1 {% else %} lni-xmark {% endif %} search" style="font-size: 1.2em;"></i>                
+    </div>    
+</div>
+
+{# Macro ricorsiva per renderizzare le categorie #}
+{% macro render_category(category, lang=session['lang'], level=0) %}
+    <li class="category-item level-{{ level }}">
+        <div class="category-wrapper">
+        {% if category.children %}
+            <button class="button is-ghost is-small expand-toggle" aria-label="Espandi categoria">
+            <span class="icon is-small">
+                <i class="lni lni-chevron-left" style="rotate:180deg" aria-hidden="true"></i>
+            </span>
+            </button>
+        {% else %}
+            <span class="expand-spacer"></span>
+        {% endif %}
+        
+        <a href="/category/{{ category.id }}" class="panel-block category-link" data-category-id="{{ category.id }}">
+            <span class="category-text is-flex-grow-1">{{ category.text[lang] if category.text[lang] else category.text['it'] }}</span>
+        </a>
+        </div>
+        
+        {% if category.children %}
+        <ul class="subcategory-list">
+            {% set sorted_children = category.children|sort(attribute='sort_order')|sort(attribute='text.' + (lang|default('it'))) if category.children[0].sort_order is not defined else category.children|sort(attribute='sort_order') %}
+            {% for child in sorted_children %}
+            {{ render_category(child, lang, level + 1) }}
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </li>
+{% endmacro %}
+
+{# Template principale della sidebar #}
+{% if categories %}
+<div class="panel">
+    <nav class="category-navigation">
+        <ul class="category-list">
+            {# All Categories come categoria principale con toggle #}
+            <li class="category-item level-0 main-category">
+                <div class="category-wrapper">
+                    <button class="button is-ghost is-small expand-toggle main-expand-toggle" aria-label="Espandi tutte le categorie">
+                        <span class="icon is-small">
+                            <i class="lni lni-chevron-left" style="rotate:180deg" aria-hidden="true"></i>
+                        </span>
+                    </button>
+                    <a href="/?brand={{request.args.get('brand')}}" class="panel-block category-link main-category-link {% if request.endpoint == 'public.index'  %} is-current {% endif %}">
+                        <span class="category-text">{{ _("All categories") }}</span>
+                    </a>
+                </div>
+                
+                {# Sottocategorie (tutte le categorie principali) #}
+                <ul class="subcategory-list main-subcategory-list">
+                    {% set main_categories = categories.values()|list %}
+                    {% set sorted_main = main_categories|sort(attribute='sort_order') if main_categories and main_categories[0].sort_order is defined else main_categories|sort(attribute='text.' + (session['lang']|default('it'))) %}
+                    {% for category in sorted_main %}
+                    {{ render_category(category, session['lang']|default('it'), 1) }}
+                    {% endfor %}
+                </ul>
+            </li>
+        </ul>
+    </nav>
+</div>
+{% endif %}
+
+{% if labels %}
+<div class="panel">
+    <nav class="category-navigation">
+        <ul class="category-list">
+            {# All Categories come categoria principale con toggle #}
+            <li class="category-item level-0 main-label">
+                <div class="category-wrapper">
+                    <button class="button is-ghost is-small expand-toggle main-expand-toggle" aria-label="Espandi tutti i brand">
+                        <span class="icon is-small">
+                            <i class="lni lni-chevron-left" style="rotate:180deg" aria-hidden="true"></i>
+                        </span>
+                    </button>
+                    <a href="{{request.path}}" class="panel-block label-link main-label-link {% if request.args.get('brand') == None or request.args.get('brand') == 'None' %} is-current {% endif %} ">
+                        <span class="label-text">{{ _("All brands") }}</span>
+                    </a>
+                </div>
+                
+                <ul class="subcategory-list main-subcategory-list">
+                    {% for label in labels %}
+                    <li>  
+                        <div class="category-wrapper">
+                            <a href="{{request.path}}?brand={{label.id}}" data-brand-id="{{label.id}}" class="panel-block label-link">
+                                <span class="category-text is-flex-grow-1">{{ label.name }}</span>
+                            </a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        </ul>
+    </nav>
+</div>
+{% endif %}
+
+{# CSS personalizzato per integrare Bulma #}
+<style>
+.search {
+    position: absolute;
+    top: 10px;
+    right: 11px;
+    cursor: pointer;
+}
+
+.category-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.expand-toggle {
+  min-width: 2rem;
+  height: 2rem;
+  border: none !important;
+  margin-right: 0.5rem;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.expand-spacer {
+  min-width: 2rem;
+  height: 2rem;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+
+.label-link,
+.category-link {
+  flex: 1;
+  border: none !important;
+  transition: all 0.2s ease;
+}
+
+.label-link.is-current,
+.category-link.is-current {
+  background-color: hsl(229, 53%, 53%) !important;
+  color: white !important;
+}
+
+.subcategory-list {
+  display: block;
+  margin-left: 0.2rem;
+  padding-left: 0;
+  list-style: none;
+}
+
+/* Stile specifico per la lista principale sotto All Categories */
+.main-subcategory-list {
+  margin-left: 1rem;
+  padding-left: 0.5rem;
+}
+
+.level-item:not(.expanded),
+.category-item:not(.expanded) > .subcategory-list {
+  display: none;
+  animation: slideUp 0.2s ease-out;
+}
+
+.level-item.expanded,
+.category-item.expanded > .subcategory-list {
+  display: block;
+  animation: slideDown 0.2s ease-out;
+}
+
+.level-item.expanded .expand-toggle .lni-chevron-left,
+.category-item.expanded .expand-toggle .lni-chevron-left {
+  transform: rotate(-90deg);
+}
+
+.level-item:not(.expanded) .expand-toggle .lni-chevron-left,
+.category-item:not(.expanded) .expand-toggle .lni-chevron-left {
+  transform: rotate(0deg);
+}
+
+.expand-toggle .icon {
+  transition: transform 0.2s ease;
+}
+
+.category-list {
+  list-style: none;
+  margin: 0 !important;
+  margin-left: 0.5em !important;
+  padding: 0;
+}
+
+/* Stile per la categoria principale "All Categories" */
+.main-label,
+.main-category {
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.main-label-link,
+.main-category-link {
+  font-weight: 600;
+}
+
+/* Evidenziazione visiva per le categorie di livello 1 sotto All Categories */
+.category-item.level-1 {
+  margin-bottom: 0.25rem;
+}
+
+.category-item.level-1 > .category-wrapper > .category-link {
+  font-weight: 500;
+}
+
+/* Animazioni */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 1;
+    max-height: 500px;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.label-text,
+.category-text {
+  font-weight: 500;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .panel {
+    border-radius: 0;
+    margin: 0;
+  }
+  
+  .category-item.level-1,
+  .category-item.level-2,
+  .category-item.level-3 {
+    margin-left: 0.25rem;
+  }
+  
+  .expand-toggle,
+  .expand-spacer {
+    min-width: 1.5rem;
+    height: 1.5rem;
+  }
+  
+  .main-subcategory-list {
+    margin-left: 0.5rem;
+    padding-left: 0.25rem;
+  }
+
+    #order,
+    #per_page {
+        width: 100%;
+    }
+
+    #order_by-div,
+    #per_page-div {
+        width: 100%;
+    }
+
+  }
+</style>
+
+{# JavaScript per la funzionalità di espansione/collasso #}
+<script>
+function getQueryParam(name, href = window.location.href) {
+  try {
+    const url = new URL(href);
+    const value = url.searchParams.get(name);
+    return value === null ? null : value;
+  } catch (e) {
+    console.error("Invalid URL:", href, e);
+    return null;
+  }
+}
+document.addEventListener('DOMContentLoaded', function() {
+  // Gestione espansione/collasso categorie
+  const expandToggles = document.querySelectorAll('.expand-toggle');
+  
+  expandToggles.forEach(toggle => {
+    toggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const categoryItem = this.closest('.category-item');
+      categoryItem.classList.toggle('expanded');
+      
+      // Se è il toggle principale "All Categories", gestisci stato speciale
+      if (this.classList.contains('main-expand-toggle')) {
+        const mainCategory = this.closest('.main-category');
+        if (mainCategory && mainCategory.classList.contains('expanded')) {
+          // Quando All Categories è espansa, espandi automaticamente le prime sottocategorie
+          setTimeout(() => {
+            const firstLevelItems = mainCategory.querySelectorAll('.category-item.level-1');
+            firstLevelItems.forEach(item => {
+              if (item.querySelector('.expand-toggle')) {
+                // Non espandere automaticamente, lascia all'utente la scelta
+              }
+            });
+          }, 200);
+        }
+      }
+    });
+  });
+  
+  // Gestione link categorie (navigazione)
+  const categoryLinks = document.querySelectorAll('.category-link');
+  
+  categoryLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      // Non impedire la navigazione per il link principale "All Categories"
+      if (!this.classList.contains('main-category-link')) {
+        // Per le altre categorie, rimuovi classe is-current da tutti i link
+        categoryLinks.forEach(l => l.classList.remove('is-current'));
+        // Aggiungi classe is-current al link cliccato
+        this.classList.add('is-current');
+      }
+    });
+  });
+  // Gestione link brand (navigazione)
+  const labelLinks = document.querySelectorAll('.label-link');
+
+
+  // Evidenzia la categoria ed il label attivi in base all'URL corrente
+  const currentPath = window.location.pathname;
+
+  var activeLink = null;
+  var activeBrand = null;
+
+  const categoryRegex=/category\/(\d+)/
+  var category = categoryRegex.exec(window.location)
+  if (category && category.length > 1) {
+    activeLink = Array.from(categoryLinks).find(link => 
+      link.getAttribute('data-category-id') == category[1]
+    );
+  }
+
+  const brandRegex = /brand=(\d+)/
+  var brand = brandRegex.exec(window.location)
+  if (brand && brand.length > 1) {
+      activeBrand = Array.from(labelLinks).find(link => 
+      link.getAttribute('data-brand-id') == brand[1]
+    );
+  }
+
+  const orderInput = document.querySelector('#order');
+  orderInput.addEventListener('change', function() {
+    const url = new URL(window.location);
+    const urlParams = new URLSearchParams(url.search);
+    urlParams.delete('order');
+    if (orderInput.value) {
+        urlParams.set('order', orderInput.value);
+    } 
+    url.search = urlParams
+    window.location.href = url;
+  })
+  
+  if (activeBrand) {
+    activeBrand.classList.add('is-current');
+
+    if (!activeBrand.classList.contains('main-label-link')) {
+      const mainLabel = document.querySelector('.main-label');
+      if (mainLabel) {
+        mainLabel.classList.add('expanded');
+      }
+    }
+  }
+
+  if (activeLink) {
+    activeLink.classList.add('is-current');
+    
+    // Se la categoria attiva non è "All Categories", espandi automaticamente la sezione
+    if (!activeLink.classList.contains('main-category-link')) {
+      const mainCategory = document.querySelector('.main-category');
+      if (mainCategory) {
+        mainCategory.classList.add('expanded');
+        
+        // Espandi anche eventuali categorie padre della categoria attiva
+        let parentCategory = activeLink.closest('.category-item');
+        while (parentCategory) {
+          parentCategory.classList.add('expanded');
+          parentCategory = parentCategory.parentElement.closest('.category-item');
+        }
+      }
+    }
+    
+    // Scroll automatico alla categoria attiva
+    setTimeout(() => {
+      activeLink.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'nearest',
+        inline: 'start'
+      });
+    }, 300);
+  } else {
+    // Se siamo sulla homepage, espandi automaticamente "All Categories"
+    if (window.location.pathname === '/') {
+      const mainCategory = document.querySelector('.main-category');
+      if (mainCategory) {
+        mainCategory.classList.add('expanded');
+      }
+    }
+  }
+  document.getElementById('per_page').addEventListener('change', () => {
+    const perPage = document.getElementById('per_page').value;
+    const brand = getQueryParam('brand')
+    const page = getQueryParam('page')
+    
+    const baseUrl = `${location.protocol}//${location.href.split("//")[1].split("?")[0]}?`;
+
+    let fullUrl = `${baseUrl}per_page=${perPage}`;
+    fullUrl += page ? `&page=${page}` : `&page=1` ;
+    if (brand && brand != 'None') fullUrl += `&brand=${brand}`;
+
+    location.href = fullUrl;
+  });
+  const perPage = getQueryParam('per_page')
+  if (perPage) {
+    document.getElementById('per_page').value = perPage;
+  }
+});
+</script>

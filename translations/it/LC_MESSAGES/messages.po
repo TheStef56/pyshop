@@ -1,0 +1,641 @@
+# Italian translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-10-20 19:53+0200\n"
+"PO-Revision-Date: 2025-10-20 19:13+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: it\n"
+"Language-Team: it <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: blueprints/public.py:636
+msgid "Order received"
+msgstr "Ordine ricevuto"
+
+#: blueprints/public.py:692
+msgid "Package not found!"
+msgstr "Pacchetto non trovato!"
+
+#: blueprints/public.py:697
+msgid "Shipping has not begun yet!"
+msgstr "La spedizione non è ancora iniziata!"
+
+#: forms/public/checkout.py:21 forms/public/checkout.py:36
+msgid "Name"
+msgstr "Nome"
+
+#: forms/public/checkout.py:22 forms/public/checkout.py:37
+msgid "Last name"
+msgstr "Cognome"
+
+#: forms/public/checkout.py:23 forms/public/checkout.py:38
+msgid "Street"
+msgstr "Strada"
+
+#: forms/public/checkout.py:24 forms/public/checkout.py:39
+msgid "Number"
+msgstr "Numero"
+
+#: forms/public/checkout.py:25 forms/public/checkout.py:41
+msgid "Postal code"
+msgstr "Codice Postale"
+
+#: forms/public/checkout.py:26 forms/public/checkout.py:40
+msgid "City"
+msgstr "Città"
+
+#: forms/public/checkout.py:27
+msgid "Email"
+msgstr "E-mail"
+
+#: forms/public/checkout.py:28
+msgid "Phone number"
+msgstr "Numero di telefono"
+
+#: forms/public/checkout.py:29
+msgid "Fiscal code / VAT"
+msgstr "Codice fiscale/P.IVA"
+
+#: forms/public/checkout.py:31 forms/public/checkout.py:43
+msgid "Country"
+msgstr "Paese"
+
+#: forms/public/checkout.py:32 forms/public/checkout.py:44
+msgid "State/Province/Region"
+msgstr "Stato / Provincia / Regione"
+
+#: forms/public/checkout.py:46
+msgid "Delivery notes"
+msgstr "Note di consegna"
+
+#: mails/summary.py:20
+msgid "Thank for your order!"
+msgstr "Grazie per il tuo ordine!"
+
+#: mails/summary.py:21
+msgid "Hello! We received your order"
+msgstr "Ciao!Abbiamo ricevuto il tuo ordine"
+
+#: mails/summary.py:22 templates/public/views/payment/completed.html:41
+msgid "Order details"
+msgstr "Dettagli dell'ordine"
+
+#: mails/summary.py:56
+msgid "Quantity: "
+msgstr "Quantità:"
+
+#: mails/summary.py:69 templates/public/views/checkout.html:286
+msgid "Shipping address"
+msgstr "Indirizzo di spedizione"
+
+#: mails/summary.py:70
+msgid "All rights reserved"
+msgstr "Tutti i diritti riservati"
+
+#: mails/summary.py:71
+msgid "Need help? Contact us at"
+msgstr "Hai bisogno di aiuto?Contattaci a"
+
+#: mails/summary.py:74
+msgid "Shipment"
+msgstr "Spedizione"
+
+#: mails/summary.py:75 templates/public/views/shipment-checkout.html:94
+msgid "Total"
+msgstr "Totale"
+
+#: mails/summary.py:76
+msgid "You can track your order at"
+msgstr "Puoi monitorare il tuo ordine su"
+
+#: templates/admin/views/orders/edit.html:24
+msgid "Prodotti acquistati"
+msgstr "Prodotti acquistati"
+
+#: templates/admin/views/orders/edit.html:54
+msgid "Prezzo unitario"
+msgstr "Prezzo unitario"
+
+#: templates/admin/views/orders/edit.html:58
+msgid "Quantità"
+msgstr "Quantità"
+
+#: templates/admin/views/orders/edit.html:62
+msgid "Totale"
+msgstr "Totale"
+
+#: templates/admin/views/orders/edit.html:71
+msgid "Totale Ordine"
+msgstr "Totale Ordine"
+
+#: templates/admin/views/orders/edit.html:82
+msgid "Informazioni di Fatturazione"
+msgstr "Informazioni di Fatturazione"
+
+#: templates/admin/views/orders/edit.html:92
+msgid "Codice Fiscale"
+msgstr "Codice Fiscale"
+
+#: templates/admin/views/orders/edit.html:103
+msgid "Informazioni di Spedizione"
+msgstr "Informazioni di Spedizione"
+
+#: templates/admin/views/orders/edit.html:126
+msgid "Stato ordine"
+msgstr "Stato ordine"
+
+#: templates/admin/views/orders/edit.html:136
+msgid "Pagato"
+msgstr "Pagato"
+
+#: templates/admin/views/orders/edit.html:145
+msgid "Salva"
+msgstr "Salva"
+
+#: templates/admin/views/orders/edit.html:146
+msgid "Scarica la fattura"
+msgstr "Scarica la fattura"
+
+#: templates/public/base.html:125
+msgid "Cookie policy"
+msgstr "Politica sui cookie"
+
+#: templates/public/base.html:128
+msgid "Privacy policy"
+msgstr "Politica sulla riservatezza"
+
+#: templates/public/base.html:166
+msgid ""
+"This website uses essential cookies to ensure its proper functioning. By "
+"continuing to browse, you accept their use."
+msgstr ""
+"Questo sito utilizza cookie essenziali per garantirne il corretto "
+"funzionamento.Continuando la navigazione accetti il ​​loro utilizzo."
+
+#: templates/public/base.html:167
+msgid "Learn more"
+msgstr "Saperne di più"
+
+#: templates/public/base.html:169
+msgid "Close"
+msgstr ""
+
+#: templates/public/components/product_grid.html:66
+msgid "No variants found"
+msgstr "Nessuna variante trovata"
+
+#: templates/public/shared/header.html:141
+msgid "Contact us"
+msgstr "Contattaci"
+
+#: templates/public/shared/sidebar.html:6
+#, fuzzy
+msgid "9 per page"
+msgstr "6 per pagina"
+
+#: templates/public/shared/sidebar.html:7
+#, fuzzy
+msgid "15 per page"
+msgstr "18 per pagina"
+
+#: templates/public/shared/sidebar.html:8
+#, fuzzy
+msgid "30 per page"
+msgstr "36 per pagina"
+
+#: templates/public/shared/sidebar.html:13
+msgid "Relevance"
+msgstr "Rilevanza"
+
+#: templates/public/shared/sidebar.html:14
+msgid "Best price"
+msgstr "Miglior prezzo"
+
+#: templates/public/shared/sidebar.html:15
+msgid "Best discount"
+msgstr "Miglior sconto"
+
+#: templates/public/shared/sidebar.html:71
+msgid "All categories"
+msgstr "Tutte le categorie"
+
+#: templates/public/shared/sidebar.html:102
+msgid "All brands"
+msgstr "Tutti i marchi"
+
+#: templates/public/views/cart.html:12
+msgid "Your cart"
+msgstr "Il tuo carrello"
+
+#: templates/public/views/cart.html:20
+msgid "article"
+msgstr "articolo"
+
+#: templates/public/views/cart.html:20
+msgid "articles"
+msgstr "articoli"
+
+#: templates/public/views/cart.html:33
+msgid "Cart empty"
+msgstr "Carrello vuoto"
+
+#: templates/public/views/cart.html:34
+msgid "Add a few products to start shopping!"
+msgstr "Aggiungi alcuni prodotti per iniziare a fare acquisti!"
+
+#: templates/public/views/cart.html:39 templates/public/views/home.html:98
+msgid "Go to shop"
+msgstr "Vai al negozio"
+
+#: templates/public/views/cart.html:77
+msgid "Original price"
+msgstr "Prezzo originale"
+
+#: templates/public/views/cart.html:81 templates/public/views/cart.html:86
+#: templates/public/views/shipment-checkout.html:49
+#: templates/public/views/shipment-checkout.html:55
+msgid "Unit price"
+msgstr "Prezzo unitario"
+
+#: templates/public/views/cart.html:95
+msgid "Decrease quantity"
+msgstr "Diminuire la quantità"
+
+#: templates/public/views/cart.html:112
+msgid "Increase quantity"
+msgstr "Aumenta la quantità"
+
+#: templates/public/views/cart.html:129
+msgid "Product total price"
+msgstr "Prezzo totale del prodotto"
+
+#: templates/public/views/cart.html:136
+msgid "Remove"
+msgstr "Rimuovere"
+
+#: templates/public/views/cart.html:149
+#: templates/public/views/shipment-checkout.html:6
+msgid "Order Summary"
+msgstr "Riepilogo dell'ordine"
+
+#: templates/public/views/cart.html:156
+msgid "Provisional total"
+msgstr "Totale provvisorio"
+
+#: templates/public/views/cart.html:173
+msgid "Go to checkout"
+msgstr "Vai alla cassa"
+
+#: templates/public/views/cart.html:180
+msgid "Continue shopping"
+msgstr "Continua a fare acquisti"
+
+#: templates/public/views/checkout.html:10
+msgid "Order data"
+msgstr "Dati dell'ordine"
+
+#: templates/public/views/checkout.html:12
+msgid "Complete your order information"
+msgstr "Completa le informazioni dell'ordine"
+
+#: templates/public/views/checkout.html:27
+msgid "Shop"
+msgstr "Negozio"
+
+#: templates/public/views/checkout.html:44
+msgid "Cart"
+msgstr "Carrello"
+
+#: templates/public/views/checkout.html:60
+msgid "Checkout"
+msgstr "Guardare"
+
+#: templates/public/views/checkout.html:75
+msgid "Payment"
+msgstr "Pagamento"
+
+#: templates/public/views/checkout.html:106
+msgid "Billing details"
+msgstr "Dettagli di fatturazione"
+
+#: templates/public/views/checkout.html:296
+msgid "Copy from billing"
+msgstr "Copia dalla fatturazione"
+
+#: templates/public/views/checkout.html:409
+msgid "Additional delivery instructions..."
+msgstr "Ulteriori istruzioni per la consegna..."
+
+#: templates/public/views/checkout.html:420
+msgid "Continue to Shipping"
+msgstr "Continua a Spedizione"
+
+#: templates/public/views/contacts.html:6
+msgid "Contacts"
+msgstr "Contatti"
+
+#: templates/public/views/contacts.html:93
+msgid "No contacts available"
+msgstr "Nessun contatto disponibile"
+
+#: templates/public/views/cookies.html:6
+msgid "Cookie Policy"
+msgstr "Politica sui cookie"
+
+#: templates/public/views/cookies.html:8
+msgid "Last updated:"
+msgstr "Ultimo aggiornamento:"
+
+#: templates/public/views/cookies.html:8
+msgid "August 01 2025"
+msgstr "01 agosto 2025"
+
+#: templates/public/views/cookies.html:10
+msgid "At"
+msgstr "A"
+
+#: templates/public/views/cookies.html:10
+msgid ""
+"we use cookies to ensure the proper functioning of our website and to "
+"provide you with the best possible experience. This Cookie Policy "
+"explains what cookies are, which ones we use, and your choices regarding "
+"cookies."
+msgstr ""
+"utilizziamo i cookie per garantire il corretto funzionamento del nostro "
+"sito web e per fornirti la migliore esperienza possibile.La presente "
+"Politica sui cookie spiega cosa sono i cookie, quali utilizziamo e le tue"
+" scelte in merito ai cookie."
+
+#: templates/public/views/cookies.html:12
+msgid "What are cookies?"
+msgstr "Cosa sono i cookie?"
+
+#: templates/public/views/cookies.html:13
+msgid ""
+"cookies are small text files stored on your device when you visit a "
+"website. They help websites remember information about your visit, such "
+"as your preferences or login status."
+msgstr ""
+"i cookie sono piccoli file di testo memorizzati sul tuo dispositivo "
+"quando visiti un sito web.Aiutano i siti Web a ricordare le informazioni "
+"sulla tua visita, come le tue preferenze o lo stato di accesso."
+
+#: templates/public/views/cookies.html:15
+msgid "Which cookies do we use?"
+msgstr "Quali cookie utilizziamo?"
+
+#: templates/public/views/cookies.html:16
+msgid "We use only"
+msgstr "Usiamo solo"
+
+#: templates/public/views/cookies.html:16
+msgid "technical cookies"
+msgstr "cookie tecnici"
+
+#: templates/public/views/cookies.html:16
+msgid ""
+"that are strictly necessary for the operation of our website. These "
+"cookies enable basic functions such as page navigation, secure login, and"
+" shopping cart functionality."
+msgstr ""
+"che sono strettamente necessari per il funzionamento del nostro sito "
+"web.Questi cookie abilitano funzioni di base come la navigazione della "
+"pagina, l'accesso sicuro e la funzionalità del carrello."
+
+#: templates/public/views/cookies.html:19
+msgid "Session cookies:"
+msgstr "Cookie di sessione:"
+
+#: templates/public/views/cookies.html:19
+msgid ""
+"These cookies keep track of your session and expire when you close your "
+"browser."
+msgstr ""
+"Questi cookie tengono traccia della tua sessione e scadono quando chiudi "
+"il browser."
+
+#: templates/public/views/cookies.html:22
+msgid "Do we use third-party cookies?"
+msgstr "Utilizziamo cookie di terze parti?"
+
+#: templates/public/views/cookies.html:23
+msgid ""
+"No, we do not use any third-party cookies, tracking or advertising "
+"cookies."
+msgstr ""
+"No, non utilizziamo cookie di terze parti, cookie di tracciamento o "
+"pubblicitari."
+
+#: templates/public/views/cookies.html:25
+msgid "Your choices regarding cookies"
+msgstr "Le tue scelte riguardo ai cookie"
+
+#: templates/public/views/cookies.html:26
+msgid ""
+"Since we use only essential technical cookies, there is no need to give "
+"consent to use our site. You can configure your browser to block or "
+"delete cookies; however, this may affect the functionality of our "
+"website."
+msgstr ""
+"Poiché utilizziamo solo cookie tecnici essenziali, non è necessario "
+"prestare il consenso per utilizzare il nostro sito.Puoi configurare il "
+"tuo browser per bloccare o eliminare i cookie;tuttavia, ciò potrebbe "
+"influire sulla funzionalità del nostro sito web."
+
+#: templates/public/views/cookies.html:28
+msgid "More information"
+msgstr "Maggiori informazioni"
+
+#: templates/public/views/cookies.html:29
+msgid "If you have any questions about our use of cookies, please"
+msgstr "Se hai domande sul nostro utilizzo dei cookie, per favore"
+
+#: templates/public/views/cookies.html:29
+msgid "contact us"
+msgstr "contattaci"
+
+#: templates/public/views/privacy_policy.html:6
+msgid "Privacy Policy"
+msgstr "politica sulla riservatezza"
+
+#: templates/public/views/product_variant.html:136
+msgid "price"
+msgstr "prezzo"
+
+#: templates/public/views/product_variant.html:145
+msgid "in stock"
+msgstr "in magazzino"
+
+#: templates/public/views/product_variant.html:149
+msgid "Order now"
+msgstr "Ordina ora"
+
+#: templates/public/views/product_variant.html:156
+msgid "Out of stock"
+msgstr "Esaurito"
+
+#: templates/public/views/product_variant.html:158
+msgid "Add to cart"
+msgstr "Aggiungi al carrello"
+
+#: templates/public/views/product_variant.html:204
+msgid "More info"
+msgstr "Maggiori informazioni"
+
+#: templates/public/views/shipment-checkout.html:25
+msgid "Your Products"
+msgstr "I tuoi prodotti"
+
+#: templates/public/views/shipment-checkout.html:60
+msgid "Quantity"
+msgstr "Quantità"
+
+#: templates/public/views/shipment-checkout.html:64
+msgid "Subtotal"
+msgstr "Totale parziale"
+
+#: templates/public/views/shipment-checkout.html:85
+msgid "Order Details"
+msgstr "Dettagli dell'ordine"
+
+#: templates/public/views/shipment-checkout.html:90
+msgid "DAYS"
+msgstr "GIORNI"
+
+#: templates/public/views/shipment-checkout.html:91
+msgid "Shipping Method"
+msgstr "Metodo di spedizione"
+
+#: templates/public/views/shipment-checkout.html:95
+msgid "with VAT"
+msgstr "con IVA"
+
+#: templates/public/views/shipment-checkout.html:108
+msgid "Billing Information"
+msgstr "Informazioni di fatturazione"
+
+#: templates/public/views/shipment-checkout.html:118
+msgid "Tax Code"
+msgstr "Codice Fiscale"
+
+#: templates/public/views/shipment-checkout.html:129
+msgid "Shipping Information"
+msgstr "Informazioni sulla spedizione"
+
+#: templates/public/views/shipment-checkout.html:145
+msgid "Pay with Paypal"
+msgstr "Paga con Paypal"
+
+#: templates/public/views/shipment-checkout.html:146
+msgid "Back to Checkout"
+msgstr "Torna alla cassa"
+
+#: templates/public/views/tracking.html:11
+msgid "Shipment tracking"
+msgstr "Monitoraggio della spedizione"
+
+#: templates/public/views/payment/cancelled.html:19
+msgid "Payment cancelled"
+msgstr "Pagamento annullato"
+
+#: templates/public/views/payment/cancelled.html:23
+msgid "You have cancelled the payment process. No amount has been charged."
+msgstr "Hai annullato il processo di pagamento.Nessun importo è stato addebitato."
+
+#: templates/public/views/payment/cancelled.html:25
+msgid "Reference:"
+msgstr "Riferimento:"
+
+#: templates/public/views/payment/cancelled.html:36
+msgid "Retry payment"
+msgstr "Riprovare il pagamento"
+
+#: templates/public/views/payment/cancelled.html:44
+#: templates/public/views/payment/completed.html:33
+msgid "Back to Home"
+msgstr "Ritorno a casa"
+
+#: templates/public/views/payment/cancelled.html:52
+msgid "Need help?"
+msgstr "Hai bisogno di aiuto?"
+
+#: templates/public/views/payment/cancelled.html:55
+msgid "Contact our support team at"
+msgstr "Contatta il nostro team di supporto all'indirizzo"
+
+#: templates/public/views/payment/cancelled.html:58
+msgid "or call"
+msgstr "o chiama"
+
+#: templates/public/views/payment/completed.html:19
+msgid "Payment completed!"
+msgstr "Pagamento completato!"
+
+#: templates/public/views/payment/completed.html:23
+msgid "Thank you for your purchase. Your payment has been successfully processed."
+msgstr "Grazie per il tuo acquistoIl tuo pagamento è stato elaborato con successo."
+
+#: templates/public/views/payment/completed.html:24
+msgid "Order ID:"
+msgstr "ID ordine:"
+
+#: templates/public/views/payment/completed.html:44
+msgid "Amount:"
+msgstr "Quantità:"
+
+#: templates/public/views/payment/completed.html:45
+msgid "Payment method:"
+msgstr "Metodo di pagamento:"
+
+#: templates/public/views/payment/error.html:19
+msgid "Payment Failed"
+msgstr "Pagamento non riuscito"
+
+#: templates/public/views/payment/error.html:27
+msgid "An unexpected error occurred during payment processing."
+msgstr "Si è verificato un errore imprevisto durante l'elaborazione del pagamento."
+
+#: templates/public/views/payment/error.html:34
+msgid "Reference"
+msgstr "Riferimento"
+
+#: templates/public/views/payment/error.html:48
+msgid "Try Again"
+msgstr "Riprova"
+
+#: templates/public/views/payment/error.html:57
+msgid "Technical Details"
+msgstr "Dettagli tecnici"
+
+#: templates/shared/js/cart_manager.html:16
+msgid "Product added to cart"
+msgstr "Prodotto aggiunto al carrello"
+
+#: templates/shared/js/cart_manager.html:18
+msgid "An error prevented the product from being added to the cart."
+msgstr "Un errore ha impedito l'aggiunta del prodotto al carrello."
+
+#: templates/shared/js/cart_manager.html:40
+#: templates/shared/js/cart_manager.html:78
+msgid "Unable to increase product quantity"
+msgstr "Impossibile aumentare la quantità del prodotto"
+
+#: templates/shared/js/cart_manager.html:42
+#: templates/shared/js/cart_manager.html:80
+msgid "An error prevented the product from being added to the cart"
+msgstr "Un errore ha impedito l'aggiunta del prodotto al carrello"
+
+#: templates/shared/js/cart_manager.html:57
+msgid "An error prevented the product from being removed from the cart."
+msgstr "Un errore ha impedito la rimozione del prodotto dal carrello."
+

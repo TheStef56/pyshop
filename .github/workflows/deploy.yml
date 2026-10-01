@@ -1,0 +1,102 @@
+name: Deploy to PythonAnywhere
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy via rsync action - DOPESHIRTS
+        uses: up9cloud/action-rsync@v1.4
+        env:
+          HOST: ${{ secrets.PYTHONANYWHERE_HOST }}
+          USER: ${{ secrets.PYTHONANYWHERE_USERNAME }}
+          PASSWORD: ${{ secrets.PYTHONANYWHERE_PASSWORD }}
+          SOURCE: ./
+          TARGET: /home/${{ secrets.PYTHONANYWHERE_USERNAME }}/dopeshirts/
+          ARGS: >-
+            -avz --delete
+            --exclude=/.github/
+            --exclude=/.git/
+            --exclude=/static/uploads/
+            --exclude=/venv/
+            --exclude=/flask_cache/
+            --exclude=/.env
+            --exclude=/migrations/versions/*.py
+          SSH_ARGS: '-o StrictHostKeyChecking=no'
+      
+      - name: Add .env file - DOPESHIRTS
+        run: |
+          sshpass -p "${{ secrets.PYTHONANYWHERE_PASSWORD }}" ssh -o StrictHostKeyChecking=no \
+            ${{ secrets.PYTHONANYWHERE_USERNAME }}@${{ secrets.PYTHONANYWHERE_HOST }} \
+            "echo '${{ secrets.DOPESHIRTS_ENV }}' > /home/${{ secrets.PYTHONANYWHERE_USERNAME }}/dopeshirts/.env && chmod 600 /home/${{ secrets.PYTHONANYWHERE_USERNAME }}/dopeshirts/.env"
+
+      - name: Update virtualenv - DOPESHIRTS
+        run: |
+          sshpass -p "${{ secrets.PYTHONANYWHERE_PASSWORD }}" ssh -o StrictHostKeyChecking=no \
+            ${{ secrets.PYTHONANYWHERE_USERNAME }}@${{ secrets.PYTHONANYWHERE_HOST }} \
+            "workon dopeshirts && \
+            pip install --upgrade pip && \
+            pip install --no-cache-dir -r /home/${{ secrets.PYTHONANYWHERE_USERNAME }}/dopeshirts/requirements.txt && \
+            cd /home/${{ secrets.PYTHONANYWHERE_USERNAME }}/dopeshirts && \
+            flask db migrate -m "update" && \
+            flask db upgrade && \
+            python manage.py seed"
+      
+      - name: Reload webapp - DOPESHIRTS
+        uses: jensvog/pythonanywhere-webapp-reload-action@v1
+        with:
+          host: 'eu.pythonanywhere.com'
+          username: ${{ secrets.PYTHONANYWHERE_USERNAME }}
+          api-token: ${{ secrets.PYTHON_ANYWHERE_API_TOKEN }}
+          domain-name: www.dopeshirts.shop
+
+      - name: Deploy via rsync action - GPMOTOSHOP
+        uses: up9cloud/action-rsync@v1.4
+        env:
+          HOST: ${{ secrets.PYTHONANYWHERE_HOST }}
+          USER: ${{ secrets.PYTHONANYWHERE_USERNAME }}
+          PASSWORD: ${{ secrets.PYTHONANYWHERE_PASSWORD }}
+          SOURCE: ./
+          TARGET: /home/${{ secrets.PYTHONANYWHERE_USERNAME }}/gpmotoshop/
+          ARGS: >-
+            -avz --delete
+            --exclude=/.github/
+            --exclude=/.git/
+            --exclude=/static/uploads/
+            --exclude=/venv/
+            --exclude=/flask_cache/
+            --exclude=/.env
+            --exclude=/migrations/versions/*.py
+          SSH_ARGS: '-o StrictHostKeyChecking=no'
+      
+      - name: Add .env file - GPMOTOSHOP
+        run: |
+          sshpass -p "${{ secrets.PYTHONANYWHERE_PASSWORD }}" ssh -o StrictHostKeyChecking=no \
+            ${{ secrets.PYTHONANYWHERE_USERNAME }}@${{ secrets.PYTHONANYWHERE_HOST }} \
+            "echo '${{ secrets.GPMOTOSHOP_ENV }}' > /home/${{ secrets.PYTHONANYWHERE_USERNAME }}/gpmotoshop/.env && chmod 600 /home/${{ secrets.PYTHONANYWHERE_USERNAME }}/gpmotoshop/.env"
+
+      - name: Update virtualenv - GPMOTOSHOP
+        run: |
+          sshpass -p "${{ secrets.PYTHONANYWHERE_PASSWORD }}" ssh -o StrictHostKeyChecking=no \
+            ${{ secrets.PYTHONANYWHERE_USERNAME }}@${{ secrets.PYTHONANYWHERE_HOST }} \
+            "workon gpmotoshop && \
+            pip install --upgrade pip && \
+            pip install --no-cache-dir -r /home/${{ secrets.PYTHONANYWHERE_USERNAME }}/gpmotoshop/requirements.txt && \
+            cd /home/${{ secrets.PYTHONANYWHERE_USERNAME }}/gpmotoshop && \
+            flask db migrate -m "update" && \
+            flask db upgrade && \
+            python manage.py seed"
+      
+      - name: Reload webapp - GPMOTOSHOP
+        uses: jensvog/pythonanywhere-webapp-reload-action@v1
+        with:
+          host: 'eu.pythonanywhere.com'
+          username: ${{ secrets.PYTHONANYWHERE_USERNAME }}
+          api-token: ${{ secrets.PYTHON_ANYWHERE_API_TOKEN }}
+          domain-name: www.gpmotoshop.it

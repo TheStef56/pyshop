@@ -1,0 +1,82 @@
+<!-- Grid content -->
+<style>
+.discount-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background-color: #ff3860; /* colore danger Bulma */
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  font-size: 0.85rem;
+  z-index: 10;
+}
+
+.grid-item {
+    position: relative;
+}
+</style>
+
+<div class="responsive-grid">
+    {% for variant in variants %}
+        {% set variant_index = loop.index %}
+            {% set unique_index = variant_index %}
+
+            <div class="grid-item has-background-secondary-lighter" style="cursor:pointer"  onclick="window.location='{{variant["location"]}}'">
+                <div style="width:100%; margin-bottom:1em" class="is-flex is-justify-content-center">
+                    <b class="p-3 m-0">{{ variant.name }}</b>
+                </div>
+
+                <div class="swiper swiper-{{ unique_index }}">
+                    <div class="swiper-wrapper">
+                        {% if variant.images %}
+                            {% for key, img in variant.images %}
+                            <div class="swiper-slide">
+                                <img src="{{ img['path'] }}" alt="variant Image">
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                <div class="swiper-pagination swiper-pagination-{{ unique_index }}"></div>
+            </div>
+
+            <div class="mt-auto p-2 is-flex is-flex-direction-column">
+                {% if variant['discount'] | float != 0.0 %}
+                    <b class="mx-auto"><s>{{ variant['original_price'] }}</s></b>
+                {% endif %}
+                <b class="mx-auto {% if variant['discount'] | float != 0.0 %} has-text-danger {% endif %}">
+                    {{ variant['price'] }}
+                </b>
+            </div>
+            {% if variant['discount'] | float != 0.0 %}
+                <div class="discount-badge">
+                    -{{ variant['discount'] }}%
+                </div>
+            {% endif %}
+            </div>
+    {% endfor %}
+</div>
+{% if variants|length == 0 %}
+<div class="notification has-text-centered is-warning">
+    <span class="icon is-large">
+        <i class="lni lni-search-1" style="font-size: 2rem;"></i>
+    </span>
+    <p class="is-size-5 mt-2">
+        <strong>{{_('No variants found')}}</strong>
+    </p>
+</div>
+{% endif %}
+
+<script type="text/javascript">
+    {% for variant in variants %}
+        {% set variant_index = loop.index %}
+        new Swiper('.swiper-{{ variant_index }}', {
+            loop: true,
+            pagination: {
+                el: '.swiper-pagination-{{ variant_index }}',
+                clickable: true,
+            },
+        });
+    {% endfor %}
+</script>

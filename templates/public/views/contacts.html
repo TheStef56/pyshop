@@ -1,0 +1,97 @@
+{% extends "public/base.html" %}
+
+{% block content %}
+<div class="main-container section">
+  <div class="container">
+    <h1 class="title has-text-centered mb-6">{{ _('Contacts') }}</h1>
+
+    {% if global_settings.meta.contacts %}
+      <div class="columns is-multiline is-centered">
+
+        {% if global_settings.meta.contacts.get('contact_whatsapp', None) %}
+          <div class="column is-6">
+            <a href="https://wa.me/{{ global_settings.meta.contacts.get('contact_whatsapp') | replace('+','') }}" target="_blank" class="card box has-text-centered is-clickable">
+              <div class="card-content">
+                <span class="icon is-large has-text-success">
+                  <i class="lni lni-whatsapp" style="font-size:2rem;"></i>
+                </span>
+                <p class="title is-5 mt-3">WhatsApp</p>
+                <p class="subtitle is-6">
+                  {{ global_settings.meta.contacts.get('contact_whatsapp') }}
+                </p>
+              </div>
+            </a>
+          </div>
+        {% endif %}
+
+        {% if global_settings.meta.contacts.get('contact_phone', None) %}
+          <div class="column is-6">
+            <a href="tel:{{ global_settings.meta.contacts.get('contact_phone') }}" class="card box has-text-centered is-clickable">
+              <div class="card-content">
+                <span class="icon is-large has-text-link">
+                  <i class="lni lni-phone" style="font-size:2rem;"></i>
+                </span>
+                <p class="title is-5 mt-3">Telefono</p>
+                <p class="subtitle is-6">
+                  {{ global_settings.meta.contacts.get('contact_phone') }}
+                </p>
+              </div>
+            </a>
+          </div>
+        {% endif %}
+
+        {% if global_settings.meta.contacts.get('contact_instagram', None) %}
+          <div class="column is-6">
+            <a href="{{ global_settings.meta.contacts.get('contact_instagram') }}" target="_blank" class="card box has-text-centered is-clickable">
+              <div class="card-content">
+                <span class="icon is-large has-text-danger">
+                  <i class="lni lni-instagram" style="font-size:2rem;"></i>
+                </span>
+                <p class="title is-5 mt-3">Instagram</p>
+                <p class="subtitle is-6">
+                  {{ global_settings.meta.contacts.get('contact_instagram') }}
+                </p>
+              </div>
+            </a>
+          </div>
+        {% endif %}
+
+        {% if global_settings.meta.contacts.get('contact_facebook', None) %}
+          <div class="column is-6">
+            <a href="{{ global_settings.meta.contacts.get('contact_facebook') }}" target="_blank" class="card box has-text-centered is-clickable">
+              <div class="card-content">
+                <span class="icon is-large has-text-info">
+                  <i class="lni lni-facebook" style="font-size:2rem;"></i>
+                </span>
+                <p class="title is-5 mt-3">Facebook</p>
+                <p class="subtitle is-6">
+                  {{ global_settings.meta.contacts.get('contact_facebook') }}
+                </p>
+              </div>
+            </a>
+          </div>
+        {% endif %}
+
+        {% if global_settings.meta.contacts.get('contact_mail', None) %}
+          <div class="column is-6 ">
+            <a href="mailto:{{ global_settings.meta.contacts.get('contact_mail') }}" class="card box has-text-centered is-clickable">
+              <div class="card-content">
+                <span class="icon is-large has-text-primary">
+                  <i class="lni lni-envelope-1" style="font-size:2rem;"></i>
+                </span>
+                <p class="title is-5 mt-3">Email</p>
+                <p class="subtitle is-6">
+                  {{ global_settings.meta.contacts.get('contact_mail') }}
+                </p>
+              </div>
+            </a>
+          </div>
+        {% endif %}
+
+      </div>
+    {% else %}
+      <p class="has-text-centered has-text-grey">{{ _('No contacts available') }}</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,113 @@
+<script type="text/javascript">
+async function addToCart(id, option) {
+    var url = `/cart/${id}/add`
+    if (option) {
+        url = `/cart/${id}/option/${option}/add`
+    }
+    response = await fetch(url, { method: 'POST' })
+    if (response.status == 200) {
+        const cart_counters = document.querySelectorAll('.cart-counter')
+        cart_counters.forEach(element => {
+            element.classList.remove('is-hidden')
+            var currentCounter = parseInt(element.innerHTML)
+            currentCounter++
+            element.textContent = currentCounter.toString()
+        });
+        window.notyf.success("{{_('Product added to cart')}}")
+    } else {
+        window.notyf.error("{{_('An error prevented the product from being added to the cart.')}}")
+    }
+}
+
+async function addQuantity(id) {
+    let currentQuantity = document.getElementById(`quantity_${id}`).value
+    currentQuantity++;
+    const response = await fetch(
+        `/cart/${id}/add_quantity`, 
+        {
+            method: 'PUT',
+            headers: {
+                "Content-Type": "application/json"
+            }, 
+            body: JSON.stringify({ currentQuantity: currentQuantity })
+        });
+    if (response.status == 200) {
+        document.getElementById(`quantity_${id}`).value = currentQuantity
+        await loadCartPrices()
+        return
+    }
+    if (response.status == 403) {
+        window.notyf.error("{{_('Unable to increase product quantity')}}")
+    }
+    window.notyf.error("{{_('An error prevented the product from being added to the cart')}}")
+}
+
+async function removeQuantity(id) {
+    let currentQuantity = document.getElementById(`quantity_${id}`).value
+    currentQuantity--;
+    if (currentQuantity <= 0) {
+        return removeProduct(id)
+    }
+    const response = await fetch(`/cart/${id}/remove_quantity`, {method: 'PUT'})
+    if (response.status == 200) {
+        document.getElementById(`quantity_${id}`).value = currentQuantity
+        await loadCartPrices()
+        return
+    }
+    window.notyf.error("{{_('An error prevented the product from being removed from the cart.')}}")
+}
+
+async function addQuantity(id) {
+    let currentQuantity = document.getElementById(`quantity_${id}`).value
+    currentQuantity++;
+    const response = await fetch(
+        `/cart/${id}/add_quantity`, 
+        {
+            method: 'PUT',
+            headers: {
+                "Content-Type": "application/json"
+            }, 
+            body: JSON.stringify({ currentQuantity: currentQuantity })
+        });
+    if (response.status == 200) {
+        document.getElementById(`quantity_${id}`).value = currentQuantity
+        await loadCartPrices()
+        return
+    }
+    if (response.status == 403) {
+        window.notyf.error("{{_('Unable to increase product quantity')}}")
+    }
+    window.notyf.error("{{_('An error prevented the product from being added to the cart')}}")
+}
+
+async function removeProduct(id) {
+    const response = await fetch(`/cart/${id}/remove`,{method: 'PUT'})
+    if (response.status == 200) {
+        text = await response.text()
+        window.location.reload()
+    }
+}
+
+
+async function loadCartPrices() {
+    document.getElementById('checkout-btn').setAttribute('disabled', true)
+    const response = await fetch(`/cart/prices`, {method: 'GET'})
+    if (response.status == 200) {
+        const jsonData = await response.json()
+        Object.keys(jsonData).forEach((key) => {
+            let price = jsonData[key]
+            try {
+                if (key == "total_price") {
+                    document.getElementById("total").innerText = window.formatter.format(price)
+                } else {
+                    let price = jsonData[key]["total_price"]
+                    document.getElementById(`price_${key}`).innerText = window.formatter.format(price)
+                }
+            } catch {
+
+            }
+        })
+        document.getElementById('checkout-btn').removeAttribute('disabled')
+    }
+}
+</script>

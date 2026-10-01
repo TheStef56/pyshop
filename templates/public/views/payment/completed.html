@@ -1,0 +1,53 @@
+{% extends "public/base.html" %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column is-half-desktop is-full-mobile">
+                <!-- Card di conferma -->
+                <div class="card">
+                    <div class="card-content has-text-centered">
+                        <!-- Icona successo -->
+                        <div class="mb-5">
+                            <span class="icon is-large has-text-success">
+                                <i class="lni lni-checkmark-circle" style="font-size: 3rem;"></i>
+                            </span>
+                        </div>
+
+                        <!-- Titolo -->
+                        <h1 class="title is-3 mb-4">{{_('Payment completed!')}}</h1>
+                        
+                        <!-- Messaggio -->
+                        <div class="content">
+                            <p>{{_('Thank you for your purchase. Your payment has been successfully processed.')}}</p>
+                            <p>{{_('Order ID:')}} <strong>{{ order.id }}</strong></p>
+                        </div>
+
+                        <!-- Bottone torna alla home -->
+                        <div class="buttons is-centered">
+                            <a href="{{ url_for('public.index') }}" class="button is-primary">
+                                <span class="icon">
+                                    <i class="lni lni-home-2"></i>
+                                </span>
+                                <span>{{_('Back to Home')}}</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sezione dettagli ordine (opzionale) -->
+                <div class="box mt-5">
+                    <h2 class="subtitle is-4">{{_('Order details')}}</h2>
+                    <div class="content">
+                        <ul>
+                            <li>{{_('Amount:')}} <strong>{{ order.get_total(session['lang']) }}</strong></li>
+                            <li>{{_('Payment method:')}} <strong>PayPal</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

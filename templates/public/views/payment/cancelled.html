@@ -1,0 +1,66 @@
+{% extends "public/base.html" %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column is-half-desktop is-full-mobile">
+                <!-- Card di avviso -->
+                <div class="card">
+                    <div class="card-content has-text-centered">
+                        <!-- Icona cancellazione -->
+                        <div class="mb-5">
+                            <span class="icon is-large has-text-danger">
+                                <i class="lni lni-close-circle" style="font-size: 3rem;"></i>
+                            </span>
+                        </div>
+
+                        <!-- Titolo -->
+                        <h1 class="title is-3 mb-4">{{_('Payment cancelled')}}</h1>
+                        
+                        <!-- Messaggio -->
+                        <div class="content">
+                            <p>{{_('You have cancelled the payment process. No amount has been charged.')}}</p>
+                            {% if order_id %}
+                            <p>{{_('Reference:')}} <strong>{{ order_id }}</strong></p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Azioni -->
+                        <div class="buttons is-centered are-medium">
+                            <!-- Bottone riprova -->
+                            <a href="{{ url_for('public.checkout') }}" class="button is-warning">
+                                <span class="icon">
+                                    <i class="lni lni-arrow-left-circle"></i>
+                                </span>
+                                <span>{{_('Retry payment')}}</span>
+                            </a>
+                            
+                            <!-- Bottone torna alla home -->
+                            <a href="{{ url_for('public.index') }}" class="button is-light">
+                                <span class="icon">
+                                    <i class="lni lni-home-2"></i>
+                                </span>
+                                <span>{{_('Back to Home')}}</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assistenza (opzionale) -->
+                <div class="box mt-5">
+                    <h2 class="subtitle is-5">{{_('Need help?')}}</h2>
+                    <div class="content">
+                        <p>
+                            {{_('Contact our support team at')}} 
+                            <!--TODO: inserire i valori di produzione-->
+                            <a href="mailto:{{session['settings']['header']['support_mail']}}">{{session['settings']['header']['support_mail']}}</a> 
+                            {{_('or call')}} <strong>+39 123 456789</strong>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

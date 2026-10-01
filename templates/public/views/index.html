@@ -1,0 +1,100 @@
+{% extends "public/base.html" %}
+
+{% block content %}
+<div class="main-container">
+    <div class="container">
+        <div class="columns">
+            <div class="pt-6 column is-12-mobile is-4-tablet is-3-desktop m-0 p-0">
+                {% include 'public/shared/sidebar.html' %}
+            </div>
+            <div class="column vertical-hr">
+            </div>
+            <div class="column is-12-mobile is-8-tablet is-9-desktop m-0 p-0">
+                <section class="section pt-5 px-0">
+                    <div class="content px-2">
+                        {% include 'public/components/product_grid.html' %}
+                    </div>
+                    <nav class="pagination is-centered mt-4" role="navigation" aria-label="pagination">
+                            <ul class="pagination-list" id="pagination"></ul>
+                    </nav>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function getQueryParam(name, href = window.location.href) {
+  try {
+    const url = new URL(href);
+    const value = url.searchParams.get(name);
+    return value === null ? null : value;
+  } catch (e) {
+    console.error("Invalid URL:", href, e);
+    return null;
+  }
+}
+function updatePagination(p) {
+    const brand = getQueryParam('brand');
+    let fullUrl = `${location.protocol}//${location.href.split("//")[1].split("?")[0]}?`;
+    if (brand && brand != 'None') fullUrl += `brand=${brand}&`
+
+    const paginationList = document.getElementById('pagination');
+    paginationList.innerHTML = '';
+    
+    // Previous page
+    if (p.page > 1) {
+        paginationList.innerHTML += `
+            <li>
+                <a class="pagination-link" aria-label="Goto page ${p.page - 1}" 
+                   onclick="location.href = '${fullUrl}page=${p.page - 1}&per_page=${p.per_page}'">
+                    <span class="icon"><i class="lni lni-chevron-left"></i></span>
+                </a>
+            </li>
+        `;
+    }
+    
+    // Page numbers
+    for (let i = 1; i <= p.pages; i++) {
+        if (
+            i === 1 || 
+            i === p.pages || 
+            (i >= p.page - 2 && i <= p.page + 2)
+        ) {
+            paginationList.innerHTML += `
+                <li>
+                    <a class="pagination-link ${i === p.page ? 'is-current' : ''}" 
+                       aria-label="Goto page ${i}"
+                       onclick="location.href = '${fullUrl}page=${i}&per_page=${p.per_page}'">
+                        ${i}
+                    </a>
+                </li>
+            `;
+        } else if (
+            i === p.page - 3 || 
+            i === p.page + 3
+        ) {
+            paginationList.innerHTML += `
+                <li><span class="pagination-ellipsis">&hellip;</span></li>
+            `;
+        }
+    }
+    
+    // Next page
+    if (p.page < p.pages) {
+        paginationList.innerHTML += `
+            <li>
+                <a class="pagination-link" aria-label="Goto page ${p.page + 1}" 
+                   onclick="location.href = '${fullUrl}page=${p.page + 1}&per_page=${p.per_page}'">
+                    <span class="icon"><i class="lni lni-chevron-left" style="rotate:180deg"></i></span>
+                </a>
+            </li>
+        `;
+    }
+}
+document.addEventListener('DOMContentLoaded', function() {
+    updatePagination({{ pagination | safe}})
+})
+</script>
+{% endblock %}

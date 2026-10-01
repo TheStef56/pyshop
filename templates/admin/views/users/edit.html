@@ -1,0 +1,102 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="title is-3 mb-5">User {{ model_user.username if model_user.username else 'Details' }}</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div>
+                {% for category, message in messages %}
+                    <div class="notification is-{{ category }} mb-2">
+                    {{ message }}
+                    </div>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form id="user-form" static="true" method="POST" action="{% if model_user.id %}/admin/users/{{ model_user.id }}/update{%else%}/admin/users/store{%endif%}" enctype="multipart/form-data" class="mt-5">
+            {{ form.hidden_tag() }}
+            <div class="columns is-multiline">
+                <div class="column is-half">
+                    <div class="field">
+                        <label class="label">{{ form.username.label }}</label>
+                        <div class="control">
+                            {{ form.username(class="input" + (" is-danger" if form.username.errors else "")) }}
+                        </div>
+                        {% for error in form.username.errors %}
+                        <p class="help is-danger">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="column is-half">
+                    <div class="field">
+                        <label class="label">{{ form.email.label }}</label>
+                        <div class="control">
+                            {{ form.email(class="input" + (" is-danger" if form.email.errors else "")) }}
+                        </div>
+                        {% for error in form.email.errors %}
+                        <p class="help is-danger">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="column is-half">
+                    <div class="field">
+                        <label class="label">{{ form.password.label }}</label>
+                        <div class="control">
+                            {{ form.password(class="input" + (" is-danger" if form.password.errors else "")) }}
+                        </div>
+                        {% for error in form.password.errors %}
+                        <p class="help is-danger">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="column is-half">
+                    <div class="field">
+                        <label class="label">{{ form.confirm_password.label }}</label>
+                        <div class="control">
+                            {{ form.confirm_password(class="input" + (" is-danger" if form.confirm_password.errors else "")) }}
+                        </div>
+                        {% for error in form.confirm_password.errors %}
+                        <p class="help is-danger">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="column is-full">
+                    <small>Lasciare vuoti i campi password per lasciare inalterato</small>
+                </div>
+
+                <div class="column is-full">
+                    <div class="field">
+                        <div class="control">
+                            <label class="checkbox">
+                                {{ form.is_active() }} {{ form.is_active.label.text }}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="column is-full has-text-right">
+                    <div class="control">
+                        <button type="submit" class="button is-primary">
+                            <span class="icon">
+                                <i class="lni lni-floppy-disk-1"></i>
+                            </span>
+                            <span> Salva</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

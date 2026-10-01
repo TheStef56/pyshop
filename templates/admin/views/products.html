@@ -1,0 +1,300 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Prodotti{% endblock %}
+
+{% block content %}
+<style>
+    .search {
+        position: absolute;
+        top: 11px;
+        right: 10px;
+        cursor: pointer;
+    }
+
+    .row {
+        display: flex;
+    }
+
+</style>
+
+<div class="container">
+    <h1 class="title"> <i class="lni lni-cart-1"></i>Prodotti</h1>
+        <div class="level">
+            <div class="level-left">
+                <div class="level-item">
+                    <div class="select mr-2">
+                        <select id="per_page">
+                            <option value="10">10 per pagina</option>
+                            <option value="25">25 per pagina</option>
+                            <option value="50">50 per pagina</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="level-center row">
+                <div class="level-item">
+                    <div class="select mr-2">
+                        <select id="search_type">
+                            <option value="Nome">Nome</option>
+                            <option value="Marca">Marca</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="level-item" style="position: relative;">
+                    <input id="search" class="input" type="text" placeholder="Cerca...">
+                    <i id="search-icon" class="lni lni-search-1 lni-lg search"></i>  
+                </div>
+            </div>
+
+            <div class="level-rigth">
+                <button class="button is-primary" trigger="modal" modal="#product-modal" callback="clearProductModal()">
+                    <span class="icon">
+                        <i class="lni lni-plus lni-lg"></i>
+                    </span>
+                    <span>Aggiungi prodotto</span>
+                </button>
+            </div>
+    </div>
+
+    <div id="products"></div>
+    
+    <nav class="pagination is-centered mt-4" role="navigation" aria-label="pagination">
+        <ul class="pagination-list" id="pagination"></ul>
+    </nav>
+
+    <!--Confirm modal-->
+    {% set modal_title = 'Crea prodotto' %}
+    {% set modal_id = 'confirm-delete-modal'%}
+    {% set modal_body = '
+        <p>Sei sicuro di voler cancellare l\'elemento?</p>
+    '%}
+    {% set modal_footer = '
+        <button id="confirm-delete-btn" class="button is-success">Conferma</button>
+        <button class="button" trigger="modal" modal="#confirm-delete-modal" type="button">Annulla</button>
+    '%}
+    {% include "shared/modal.html" %}
+
+    {% set modal_id = 'product-modal'%}
+    {% set modal_body= '
+        <form id="product" method="POST" action="/admin/product/create" enctype="multipart/form-data">
+            <section class="modal-card-body">
+                <div class="field">
+                    <label class="label">Nome prodotto (IT)</label>
+                    <div class="control">
+                    <input class="input" type="text" name="name[it]" value="{{product.name["it"]}}" required>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Nome prodotto (EN)</label>
+                    <div class="control">
+                    <input class="input" type="text" name="name[en]" value="{{product.name["en"]}}" required>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Descrizione (IT)</label>
+                    <div class="control">
+                    <textarea class="textarea" name="description[it]">{{product.description["it"]}}</textarea>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Descrizione (EN)</label>
+                    <div class="control">
+                    <textarea class="textarea" name="description[en]">{{product.description["en"]}}</textarea>
+                    </div>
+                </div>
+            </section>
+        </form>
+        '%}
+        {% set modal_footer = '
+            <button id="confirm-save-btn" type="submit" form="product" class="button is-success" type="submit" onclick="closeModal(\'product-modal\');"><span class="icon"><i class="lni lni-floppy-disk-1"></i></span><span> Salva</span></button>
+            <button class="button" trigger="modal" modal="#product-modal" type="button" id="cancel-modal">Annulla</button>
+        '%}
+        {% include "shared/modal.html" %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentPage = 1;
+let input = document.getElementById("search");
+let type = document.getElementById("search_type");
+let icon = document.getElementById("search-icon");
+
+function clearProductModal() {
+    clearForm('#product-modal')
+    const productModal = document.getElementById('product-modal')
+    productModal.querySelector('form').setAttribute('action', `/admin/product/create`)
+    productModal.querySelector('form').setAttribute('method', `POST`)
+}
+
+async function deleteImage(id, name) {
+    response = await fetch(`/admin/product/${id}/${name}/deleteimage`, { method: "DELETE"})
+    if (response.status == 200) {
+        document.getElementById(`img_${name}`).remove()
+        window.notyf.success('Immagine rimossa correttamente')
+    } else {
+        window.notyf.error('Un errore ha impedito la rimozione dell\'immagine')
+    }
+}
+
+function showConfirmDelete(id) {
+    openModal('confirm-delete-modal')
+    document.getElementById('confirm-delete-btn').setAttribute('onclick', `deleteProduct("${id}")`);
+}
+
+async function  deleteProduct(id) {
+    response = await fetch(`/admin/product/${id}/delete`, {
+        method: "DELETE"
+    })
+    if (response.status == 200) {
+        window.notyf.success('Prodotto eliminato correttamente');
+        closeModal('confirm-delete-modal')
+    } else {
+        window.notyf.error('Un errore ha impedito la cancellazione del prodotto')
+    }
+    reloadProductsTable();
+}
+
+async function reloadProductsTable(page = 1, search = "", type="") {
+    currentPage = page;
+    const perPage = document.getElementById('per_page').value;
+    type = document.getElementById('search_type').value;
+    search = document.getElementById('search').value;
+    
+    response = await fetch(`/admin/products/list?page=${page}&per_page=${perPage}&search=${search}&type=${type}`, {
+        method: "GET"
+    });
+
+    if (response.status == 200) {
+        const { data, pagination } = await response.json();
+        
+        if (window.productsGrid) {
+            window.productsGrid.destroy();
+        }
+        document.getElementById("products").innerHTML = "";
+        
+        window.productsGrid = new gridjs.Grid({
+            columns: [
+                {
+                    name: 'Nome',
+                    id: 'name',
+                    formatter: ((cell, row) => {
+                        return cell.it || ''
+                    })
+                },
+                {
+                    name: 'Azioni',
+                    id: 'id',
+                    formatter: ((cell, row) => {
+                        const id = cell;
+                        return gridjs.html(`
+                            <a class="button is-info mr-2" href="/admin/product/${id}/edit">
+                                <span class="icon">
+                                    <i class="lni lni-pencil-1"></i>
+                                </span>
+                                <span>Modifica</span>
+                            </a>
+                            <button class="button is-danger" onclick="showConfirmDelete(${id})">
+                                <span class="icon">
+                                    <i class="lni lni-trash-3"></i>
+                                </span>
+                                <span>Elimina</span>
+                            </button>
+                        `);
+                    })
+                }
+            ],
+            data: data
+        }).render(document.getElementById('products'));
+        
+        // Update pagination
+        updatePagination(pagination);
+    }
+}
+
+function updatePagination(pagination) {
+    const paginationList = document.getElementById('pagination');
+    paginationList.innerHTML = '';
+    
+    // Previous page
+    if (pagination.page > 1) {
+        paginationList.innerHTML += `
+            <li>
+                <a class="pagination-link" aria-label="Goto page ${pagination.page - 1}" 
+                   onclick="reloadProductsTable(${pagination.page - 1})">
+                    <span class="icon"><i class="lni lni-chevron-left"></i></span>
+                </a>
+            </li>
+        `;
+    }
+    
+    // Page numbers
+    for (let i = 1; i <= pagination.pages + 1; i++) {
+        if (
+            i === 1 || 
+            i === pagination.pages || 
+            (i >= pagination.page - 2 && i <= pagination.page + 2)
+        ) {
+            paginationList.innerHTML += `
+                <li>
+                    <a class="pagination-link ${i === pagination.page ? 'is-current' : ''}" 
+                       aria-label="Goto page ${i}"
+                       onclick="reloadProductsTable(${i})">
+                        ${i}
+                    </a>
+                </li>
+            `;
+        } else if (
+            i === pagination.page - 3 || 
+            i === pagination.page + 3
+        ) {
+            paginationList.innerHTML += `
+                <li><span class="pagination-ellipsis">&hellip;</span></li>
+            `;
+        }
+    }
+    
+    // Next page
+    if (pagination.page < pagination.pages) {
+        paginationList.innerHTML += `
+            <li>
+                <a class="pagination-link" aria-label="Goto page ${pagination.page + 1}" onclick="reloadProductsTable(${pagination.page + 1})">
+                    <span class="icon"><i class="lni lni-chevron-left" style="transform: rotate(180deg)"></i></span>
+                </a>
+            </li>
+        `;
+    }
+}
+
+function restoreSearch() {
+    input.value = "";
+    icon.classList.remove("lni-xmark");
+    icon.classList.add("lni-search-1");
+    icon.onclick = () => {search();}
+    reloadProductsTable();
+}
+
+function continueSearch() {
+    if (icon.classList.contains("lni-xmark")) {
+        icon.classList.remove("lni-xmark");
+    }
+    if (!icon.classList.contains("lni-search-1")) {
+        icon.classList.add("lni-search-1");
+    }
+}
+
+function search() {
+    icon.classList.remove("lni-search-1")
+    icon.classList.add("lni-xmark")
+    icon.onclick = () => {restoreSearch();};
+    reloadProductsTable(1, input.value, type.value);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    reloadProductsTable(1);
+    document.getElementById('per_page').addEventListener('change', () => reloadProductsTable(1));
+    input.addEventListener('keydown', (event) => { if(event.key == "Enter" ) {search();} else {continueSearch();}});
+    icon.onclick = () => {search();};
+});
+</script>
+{% endblock %}

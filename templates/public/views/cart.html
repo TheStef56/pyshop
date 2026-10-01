@@ -1,0 +1,196 @@
+{% extends "public/base.html" %}
+
+{% block content %}
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Header del carrello -->
+    <div class="level mb-5">
+      <div class="level-left">
+        <div class="level-item">
+          <h1 class="title is-3">
+            <i class="lni lni-cart mr-2"></i>
+            {{ _('Your cart') }}
+          </h1>
+        </div>
+      </div>
+      {% if product_variants | length > 0 %}
+      <div class="level-right">
+        <div class="level-item">
+          <span class="tag is-info is-light is-medium">
+            {{ product_variants | length }} {{ _('article') if product_variants | length != 1 else _('articles') }}
+          </span>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    {% if product_variants | length <= 0 %}
+      <!-- Carrello vuoto -->
+      <div class="box has-text-centered py-6">
+        <div class="mb-4">
+          <i class="lni lni-cart" style="font-size: 4rem; color: #dbdbdb;"></i>
+        </div>
+        <p class="title is-5 mb-2">{{ _('Cart empty') }}</p>
+        <p class="subtitle is-6 has-text-grey mb-4">{{ _('Add a few products to start shopping!') }}</p>
+        <a href="{{ url_for('public.index') }}" class="button is-primary is-medium">
+          <span class="icon">
+            <i class="lni lni-shopping-basket"></i>
+          </span>
+          <span>{{ _('Go to shop') }}</span>
+        </a>
+      </div>
+    {% else %}
+      <!-- Prodotti nel carrello -->
+      <div class="columns">
+        <div class="column is-8">
+          {% for identifier in product_variants %}
+            {% set variant = product_variants[identifier]['variant'] %}
+            {% set product = product_variants[identifier]['product'] %}
+            <div id="product_{{ identifier }}" class="box mb-4">
+              <div class="columns is-vcentered is-mobile">
+                <!-- Immagine e dettagli prodotto -->
+                <div class="column">
+                  <div class="is-flex is-align-items-center">
+                    <figure class="image is-96x96 mr-4">
+                      <img 
+                        src="{{ variant.first_image()['path'] }}" 
+                        alt="{{ product.name[session['lang']] }}"
+                        style="object-fit: cover; border-radius: 8px; width: 96px; height: 96px;"
+                      >
+                    </figure>
+                    
+                    <div class="is-flex-grow-1">
+                      <h2 class="title is-6 mb-2">
+                        {{ product.name[session['lang']] }}
+                        {% if variant.option %} - {{ variant.options[variant.option]['name'][session['lang']] if variant.options[variant.option]['name'][session['lang']] != '' else variant.options[variant.option]['name']['it'] }}
+                        {% elif variant.name != {} %} - {{ variant.name[session['lang']] }}{% endif %}
+                        
+                        {% if variant.get_discount(session, variant.option) | float != 0.0 %}
+                          <span class="tag is-danger is-light ml-2">-{{ variant.get_discount(session, variant.option) }}%</span>
+                        {% endif %}
+                      </h2>
+
+                      <!-- Prezzi -->
+                      <div class="mb-3">
+                        {% if variant.get_discount(session, variant.option) | float != 0.0 %}
+                          <div class="is-size-7 has-text-grey">
+                            <strong>{{ _('Original price') }}:</strong>
+                            <s>{{ variant.get_original_price(session, 1, variant.option) }}</s>
+                          </div>
+                          <div class="has-text-danger">
+                            <strong>{{ _('Unit price') }}:</strong>
+                            {{ variant.get_price(session, 1, variant.option) }}
+                          </div>
+                        {% else %}
+                          <div>
+                            <strong>{{ _('Unit price') }}:</strong>
+                            {{ variant.get_price(session, 1, variant.option) }}
+                          </div>
+                        {% endif %}
+                      </div>
+
+                      <!-- Controlli quantità -->
+                      <div class="field has-addons">
+                        <div class="control">
+                          <button class="button is-small" aria-label="{{ _('Decrease quantity') }}" onclick="removeQuantity('{{ identifier }}')">
+                            <span class="icon is-small">
+                              <i class="lni lni-minus"></i>
+                            </span>
+                          </button>
+                        </div>
+                        <div class="control">
+                          <input 
+                            id="quantity_{{ identifier }}" 
+                            class="input is-small has-text-centered" 
+                            type="text" 
+                            value="{{ product_variants[identifier]['quantity'] }}" 
+                            readonly 
+                            style="width: 60px;"
+                          >
+                        </div>
+                        <div class="control">
+                          <button class="button is-small" aria-label="{{ _('Increase quantity') }}" onclick="addQuantity('{{ identifier }}')">
+                            <span class="icon is-small">
+                              <i class="lni lni-plus"></i>
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Prezzo totale e rimozione -->
+                <div class="column is-narrow has-text-right">
+                  <div class="mb-3">
+                    <p class="has-text-weight-bold is-size-5 has-text-success">
+                      <span id="price_{{ identifier }}">...</span>
+                    </p>
+                    <p class="is-size-7 has-text-grey">{{ _('Product total price') }}</p>
+                  </div>
+                  
+                  <button onclick="removeProduct('{{ identifier }}')" class="button is-danger is-outlined is-small">
+                    <span class="icon is-small">
+                      <i class="lni lni-xmark"></i>
+                    </span>
+                    <span>{{ _('Remove') }}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        
+        <!-- Riepilogo carrello -->
+        <div class="column is-4">
+          <div class="box is-sticky" style="top: 2rem;">
+            <h3 class="title is-5 mb-4">
+              <i class="lni lni-calculator mr-2"></i>
+              {{ _('Order Summary') }}
+            </h3>
+            
+            <div class="field">
+              <div class="level">
+                <div class="level-left">
+                  <div class="level-item">
+                    <span>{{ _('Provisional total') }}</span>
+                  </div>
+                </div>
+                <div class="level-right">
+                  <div class="level-item">
+                    <strong class="title is-4 has-text-primary" id="total">...</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <hr class="my-4">
+            
+            <a href="{{ url_for('public.checkout') }}" id="checkout-btn" class="button is-success is-fullwidth is-medium">
+              <span class="icon">
+                <i class="lni lni-credit-card-multiple"></i>
+              </span>
+              <span>{{ _('Go to checkout') }}</span>
+            </a>
+            
+            <a href="{{ url_for('public.index') }}" class="button is-light is-fullwidth is-small mt-2">
+              <span class="icon">
+                <i class="lni lni-arrow-left"></i>
+              </span>
+              <span>{{ _('Continue shopping') }}</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", () => {
+    loadCartPrices();
+});
+</script>
+{% endblock %}

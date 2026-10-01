@@ -1,0 +1,26 @@
+<script type="text/javascript">
+async function fetchInvoice(orderId) {
+    const response = await fetch(`/admin/order/${orderId}/download-invoice`);
+    if (response.status !== 200) {
+        window.notyf.error('Un errore ha impedito il download della fattura');
+        return;
+    }
+    const blob = await response.blob();
+    const contentDisposition = response.headers.get("Content-Disposition");
+    let filename = "fattura.xml";  // fallback
+    if (contentDisposition && contentDisposition.includes("filename=")) {
+        const match = contentDisposition.match(/filename="?(.+?)"?$/);
+        if (match && match[1]) {
+            filename = match[1];
+        }
+    }
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+}
+</script>

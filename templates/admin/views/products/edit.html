@@ -1,0 +1,232 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<!--TODO: rendi contenuti statici-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+<input type="submit" form="product" class="button is-primary mb-5" value="Salva">
+<form id="product" method="POST" action="/admin/product/{{product.id}}/update" enctype="multipart/form-data">
+    <section>
+        <!-- Nome Prodotto -->
+        <div class="columns">
+            <div class="column is-half">
+                <div class="field">
+                    <label class="label is-flex is-justify-content-space-between">Nome prodotto (IT)  <button type="button" onclick="autoTranslate(`[name='name[it]']`,`[name='name[en]']`, 'it', 'en')" class="button is-small"><i class="lni lni-refresh-circle-1-clockwise"></i> Traduci</button></label>
+                    <div class="control">
+                        <input class="input" type="text" name="name[it]" value="{{product.name['it']}}" required>
+                    </div>
+                </div>
+            </div>
+            <div class="column is-half">
+                <div class="field">
+                    <label class="label  is-flex is-justify-content-space-between">Nome prodotto (EN) <button type="button"  onclick="autoTranslate(`[name='name[en]']`,`[name='name[it]']`, 'en', 'it')" class="button is-small"><i class="lni lni-refresh-circle-1-clockwise"></i> Traduci</button></label>
+                    <div class="control">
+                        <input class="input" type="text" name="name[en]" value="{{product.name['en']}}" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Descrizione -->
+        <div class="columns">
+            <div class="column is-half">
+                <div class="field">
+                    <label class="label is-flex is-justify-content-space-between">Descrizione (IT) <button type="button" class="button is-small"  onclick="autoTranslate(`[name='description[it]']`,`[name='description[en]']`, 'it', 'en')" ><i class="lni lni-refresh-circle-1-clockwise"></i> Traduci</button></label>
+                    <div class="control">
+                        <div id="editor_description_it" class="pell"></div>
+                        <input type="hidden" name="description[it]" id="description_it">
+                    </div>
+                </div>
+            </div>
+            <div class="column is-half">
+                <div class="field">
+                    <label class="label is-flex is-justify-content-space-between">Descrizione (EN) <button type="button" class="button is-small" onclick="autoTranslate(`[name='description[en]']`,`[name='description[it]']`, 'en', 'it')"><i class="lni lni-refresh-circle-1-clockwise"></i> Traduci</button></label>
+                    <div class="control">
+                        <div id="editor_description_en" class="pell"></div>
+                        <input type="hidden" name="description[en]" id="description_en">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="columns">
+            <div class="column is-one-quarter">
+                <div class="field">
+                    <label class="label">Larghezza pacco (cm)</label>
+                    <div class="control">
+                        <input class="input" type="number" name="width" value="{{product.shipping_width}}" step="1" min="1" max="100" required>
+                    </div>
+                </div>
+            </div>
+            <div class="column is-one-quarter">
+                <div class="field">
+                    <label class="label">Lunghezza pacco (cm)</label>
+                    <div class="control">
+                        <input class="input" type="number" name="length" value="{{product.shipping_length}}" step="1" min="1" max="100" required>
+                    </div>
+                </div>
+            </div>
+            <div class="column is-one-quarter">
+                <div class="field">
+                    <label class="label">Altezza pacco (cm)</label>
+                    <div class="control">
+                        <input class="input" type="number" name="height" value="{{product.shipping_height}}" step="1" min="1" max="100" required>
+                    </div>
+                </div>
+            </div>
+            <div class="column is-one-quarter">
+                <div class="field">
+                    <label class="label">Peso pacco (kg)</label>
+                    <div class="control">
+                        <input class="input" type="number" name="weight" value="{{product.shipping_weight}}" step="0.001" min="0.15" max="50" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="columns">
+            <div class="column is-full">
+                <div class="field">
+                    <label for="label">Maggiori informazioni</label>
+                    <div class="control">
+                        <input class="input" type="url" name="more_info" value="{{product.more_info if product.more_info else ''}}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if categories %}
+        <div class="field">
+            <label class="label">Categorie prodotto</label>
+            <div class="control">
+                <select id="categorySelect" name="categories[]" multiple>
+                    {% for cat in categories %}
+                        {{cat.id}}
+                        <option value="{{ cat.id }}" {% if (cat.id|int) in product.category_ids %}selected{% endif %}>
+                            {{ cat.text['it'] }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if labels %}
+        <div class="field">
+            <label class="label">Marca</label>
+            <div class="control">
+                <select id="labelSelect" name="label">
+                    {% for lab in labels %}
+                        {{lab.id}}
+                        <option value="{{ lab.id }}" {% if (lab.id|int) == product.label_id %}selected{% endif %}>
+                            {{ lab.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        {% endif %}
+
+    </section>
+</form>
+
+<div id="variants">
+    {% for variant in product.variants %}
+    <div id="variant_{{variant.id}}" data-id="{{variant.id}}" class="variant box mb-2 mt-2">
+        <p>{{variant.name['it']}}</p>
+        <p>{{variant.description['it'] | safe}}</p>
+        <a class="button is-link my-2" href="{{url_for('admin_products.edit_variant', product_id=product.id, variant_id=variant.id)}}">
+            <i class="lni lni-pencil-1 mr-1"></i> Modifica variante
+        </a>
+        <a class="button is-primary my-2" href="javascript:cloneVariant({{variant.id}})">
+            <i class="lni lni-layers-1 mr-1"></i> Clona variante
+        </a>
+        <a class="button is-danger my-2" href="javascript:deleteVariant({{variant.id}})">
+            <i class="lni lni-trash-3 mr-1"></i> Cancella variante
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+<a href="{{url_for('admin_products.create_variant', id=product.id)}}" class="button is-success mt-2">
+    <i class="lni lni-plus mr-2"></i>Aggiungi variante
+</a>
+{% endblock %}
+
+{% block scripts %}
+{#-TODO: rendere statico-#}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const categorySelect = document.getElementById('categorySelect');
+    if (categorySelect) {
+        var choices = new Choices(categorySelect, {
+            removeItemButton: true,
+            searchEnabled: true,
+            placeholderValue: 'Seleziona categorie',
+            noResultsText: 'Nessun risultato trovato',
+            itemSelectText: 'Clicca per selezionare',
+        });
+    }
+
+    const labelSelect = document.getElementById('labelSelect');
+    if (labelSelect) {
+        var choices = new Choices(labelSelect, {
+            removeItemButton: false,
+            searchEnabled: true,
+            placeholderValue: 'Seleziona marca',
+            noResultsText: 'Nessuna marca trovata',
+            itemSelectText: 'Clicca per selezionare',
+        });
+    }
+
+    initPell('editor_description_it', 'description_it', `{{product.description['it']|safe}}`);
+    initPell('editor_description_en', 'description_en', `{{product.description['en']|safe}}`);
+
+    new Sortable(document.querySelector('#variants'),  {
+        animation: 150,
+        ghostClass: "riga-ombra", // classe per la riga fantasma
+        onEnd: async function (evt) {
+            var variantsOrders = {}
+            document.querySelectorAll('.variant').forEach((element, index) => {
+                variantsOrders[element.getAttribute('data-id')] = index + 1
+            });
+            const response = await fetch(
+                '/admin/product/{{product.id}}/variants/order', 
+                {
+                    method: "PUT",
+                    headers: { "Content-Type" : "application/json" },
+                    body: JSON.stringify(variantsOrders)
+                }
+            )
+            if (response.status == 200) {
+                window.notyf.success('Varianti ordinate correttamente')
+                return
+            }
+            window.notyf.error('Un errore ha impedito il riordinamento delle varianti')
+        }
+    })
+});
+</script>
+
+<script type="text/javascript">
+    async function cloneVariant(id) {
+        const response = await fetch(`/admin/product/{{product.id}}/variant/${id}/clone`, {method: 'PUT'})
+        if (response.status == 200) {
+            window.location.reload()
+            return
+        }
+        window.notyf.error('Un errore ha impedito l\'aggiunta della variante')
+    }
+
+    async function deleteVariant(id) {
+        const response = await fetch(`/admin/product/{{product.id}}/variant/${id}/delete`, {method:'DELETE'})
+        if (response.status == 200) {
+            document.getElementById(`variant_${id}`).remove()
+            window.notyf.success('Variante cancellata correttamente')
+            return
+        }
+        window.notyf.error('Un errore ha impedito la cancellazione della variante')
+    }
+</script>
+{% endblock %}

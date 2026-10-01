@@ -1,0 +1,267 @@
+<style>
+    .site-header {
+        background-image: url('{{ url_for('static', filename=session["settings"]["header"]["header"]) }}');
+        background-size: cover;
+        background-position: center;
+        height: 400px;
+        position: relative;
+        color: white;
+    }
+    .header-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background: rgba(0, 0, 0, 0.4); /* sovrapposizione scura */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .header-overlay img {
+        max-width: 300px;
+        width: 100%;
+        height: auto;
+    }
+    .lni {
+        font-size: 1.5em;
+    }
+    .light-icon {
+        color: white;
+    }
+    .dark-icon {
+        color: #161616;
+    }
+    .shop-nav {
+        background-color: #161616;
+        position: fixed;
+        width: 100%;
+        z-index: 10000;
+    }
+    .cart-counter {
+        position: relative;
+        top: -8px;
+        right: -10px;
+        background-color: #ff3860; /* rosso Bulma */
+        color: white;
+        font-weight: bold;
+        font-size: 0.75rem;
+        padding: 2px 6px;
+        border-radius: 50%;
+        line-height: 1;
+        text-align: center;
+        min-width: 20px;
+        height: 20px;
+        display: inline-block;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        z-index: 10001;
+    }
+
+    .navbar-item.has-text-white,
+    .navbar-link.has-text-white {
+        background-color: #161616 !important;
+        color: white !important;
+    }
+    .navbar-item.has-text-white:hover,
+    .navbar-link.has-text-white:hover {
+        background-color: #161616 !important;
+        color: white !important;
+    }
+    .navbar-dropdown.has-background-dark {
+        background-color: #161616 !important;
+        border: none;
+    }
+    .navbar-dropdown .navbar-item.has-text-white:hover {
+        background-color: #161616 !important;
+    }
+
+    /* Responsive adjustments */
+    @media screen and (max-width: 768px) {
+        .shop-nav {
+            padding: 0.5rem;
+        }
+        .cart-counter {
+            font-size: 0.65rem;
+            min-width: 18px;
+            height: 18px;
+        }
+        .header-overlay img {
+            max-width: 250px;
+            padding: 1rem;
+        }
+        .site-header {
+            height: 300px;
+        }
+
+        #search-div {
+            top: 15px !important;
+            right: 4.2em;
+            position:fixed;
+            z-index: 100000;
+        }
+    }
+
+    @media screen and (max-width: 480px) {
+        .header-overlay img {
+            max-width: 200px;
+        }
+        .site-header {
+            height: 250px;
+        }
+        .cart-counter {
+            right: 40px;
+        }
+    }
+
+    .has-background-dark,.navbar-menu {
+        background-color: #161616 !important;
+    }
+</style>
+
+<header>
+
+    <nav class="navbar shop-nav has-background-dark" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item has-text-white" href="{{url_for('public.index')}}">
+                <i class="lni lni-home-2"></i>
+            </a>
+            
+            <a role="button" class="navbar-burger has-text-white" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="navbarBasicExample" class="navbar-menu">
+            <div class="navbar-start">
+            </div>
+            
+            <div class="navbar-end">
+                <a class="navbar-item has-text-white" href="/contacts">{{_('Contact us')}}</a>
+                <!-- Theme Dropdown -->
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link has-text-white">
+                        {% if session['shop-theme'] == 'dark'%}
+                        <i class="lni lni-moon-half-right-5" style="font-size: 1.2em;"></i>
+                        {% else %}
+                        <i class="lni lni-sun-1" style="font-size: 1.2em;"></i>
+                        {% endif %}
+                    </a>
+                    <div class="navbar-dropdown is-right has-background-dark">
+                        <a class="navbar-item has-text-white" href="{{ url_for('locale.change_theme', theme='light') }}" style="display: flex; gap: 5px;">
+                            <i class="lni lni-sun-1 lni-lg"></i> Light
+                        </a>
+                        <a class="navbar-item has-text-white" href="{{ url_for('locale.change_theme', theme='dark') }}" style="display: flex; gap: 5px;">
+                            <i class="lni lni-moon-half-right-5 lni-lg"></i> Dark
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Language Dropdown -->
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link has-text-white">
+                        {% if session['lang'] == 'it' %}🇮🇹{% else %}🇺🇸{% endif %}
+                    </a>
+                    <div class="navbar-dropdown is-right has-background-dark">
+                        <a class="navbar-item has-text-white" href="{{ url_for('locale.change_lang', lang_code='en') }}">
+                            🇺🇸 English
+                        </a>
+                        <a class="navbar-item has-text-white" href="{{ url_for('locale.change_lang', lang_code='it') }}">
+                            🇮🇹 Italiano
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Currency Dropdown -->
+                {% if not hide_currency_switch() %}
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link has-text-white">
+                        {% if session['currency'] == 'eur' %}€{% else %}${% endif %}
+                    </a>
+                    <div class="navbar-dropdown is-right has-background-dark">
+                        <a class="navbar-item has-text-white" href="{{ url_for('locale.change_currency', currency_code='usd') }}">
+                            $ Dollar
+                        </a>
+                        <a class="navbar-item has-text-white" href="{{ url_for('locale.change_currency', currency_code='eur') }}">
+                            € Euro
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Cart -->
+                {% if global_settings and global_settings.meta.get('open', 'closed') == 'open' %}
+
+                <div class="navbar-item">
+                    <div class="is-relative">
+                        <span class="cart-counter {% if session.get('cart', []) | length < 1 %} is-hidden {% endif %}">{{session.get('cart', []) | length}}</span>
+                        <a class="button is-link" href="{{url_for('public.cart')}}">
+                            <i class="lni lni-cart-2 light-icon"></i>
+                        </a>
+                    </div>
+                </div>
+
+                {% endif %}
+
+            </div>
+        </div>
+    </nav>
+
+    {% if not hide_header %}
+    <div class="site-header">
+        <div class="header-overlay">
+            <a href="{{url_for('public.index')}}" class="mt-6">
+                <img src="{{url_for('static', filename=session['settings']['header']['logo']) }}">
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</header>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Get all "navbar-burger" elements
+    const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+    // Add a click event on each of them
+    $navbarBurgers.forEach( el => {
+        el.addEventListener('click', () => {
+            // Get the target from the "data-target" attribute
+            const target = el.dataset.target;
+            const $target = document.getElementById(target);
+
+            // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+            el.classList.toggle('is-active');
+            $target.classList.toggle('is-active');
+        });
+    });
+
+    const searchIcon = document.getElementById('search-icon');
+    const inputSearch = document.getElementById('search');
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('q')) {
+        searchIcon.onclick = () => {window.location.href = "/";};
+        inputSearch.value = params.get('q');
+    } else {
+        searchIcon.onclick = () => {search(inputSearch.value);};
+    }
+
+    inputSearch.addEventListener('keydown', (event) => {
+        if (event.key == 'Enter') {
+            search(inputSearch.value);
+        } else {
+            searchIcon.onclick = () => {search(inputSearch.value);};
+            if (searchIcon.classList.contains('lni-xmark')){ searchIcon.classList.remove('lni-xmark');};
+            searchIcon.classList.add('lni-search-1');
+        }
+    });
+
+});
+
+function search(query) {
+    window.location.href = "/search?q=" + query;
+}
+
+</script>

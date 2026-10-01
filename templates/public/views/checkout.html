@@ -1,0 +1,519 @@
+{% extends "public/base.html" %}
+
+{% block content %}
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Header -->
+    <div class="has-text-centered mb-5">
+      <h1 class="title is-3">
+        <i class="lni lni-wallet mr-2"></i>
+        {{ _('Order data') }}
+      </h1>
+      <p class="subtitle is-6 has-text-grey">{{ _('Complete your order information') }}</p>
+    </div>
+
+    <!-- Progress Indicator -->
+    <div class="columns is-centered mb-6">
+        <div class="column is-10">
+            <nav class="level has-text-centered">
+
+            <!-- Step 1: Shop -->
+            <div class="level-item has-text-centered">
+                <div>
+                <a href="{{ url_for('public.index') }}">
+                    <span class="icon is-medium has-text-success">
+                    <i class="lni lni-store text-2xl"></i>
+                    </span>
+                    <p class="heading mt-1">{{ _('Shop') }}</p>
+                </a>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="level-item is-narrow">
+                <span class="icon"><i class="lni lni-chevron-right"></i></span>
+            </div>
+
+            <!-- Step 2: Cart -->
+            <div class="level-item has-text-centered">
+                <div>
+                <a href="{{ url_for('public.cart') }}">
+                    <span class="icon is-medium has-text-success">
+                    <i class="lni lni-cart text-2xl"></i>
+                    </span>
+                    <p class="heading mt-1">{{ _('Cart') }}</p>
+                </a>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="level-item is-narrow">
+                <span class="icon"><i class="lni lni-chevron-right"></i></span>
+            </div>
+
+            <!-- Step 3: Checkout (active, no link) -->
+            <div class="level-item has-text-centered">
+                <div>
+                <span class="icon is-medium has-text-info">
+                    <i class="lni lni-credit-cards text-2xl"></i>
+                </span>
+                <p class="heading mt-1 has-text-info has-text-weight-semibold">{{ _('Checkout') }}</p>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="level-item is-narrow">
+                <span class="icon"><i class="lni lni-chevron-right"></i></span>
+            </div>
+
+            <!-- Step 4: Payment (future, not clickable yet) -->
+            <div class="level-item has-text-centered">
+                <div>
+                <span class="icon is-medium has-text-grey-light">
+                    <i class="lni lni-wallet text-2xl"></i>
+                </span>
+                <p class="heading mt-1 has-text-grey-light">{{ _('Payment') }}</p>
+                </div>
+            </div>
+
+            </nav>
+        </div>
+    </div>
+
+
+    <!-- Messaggi flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="mb-4">
+          {% for category, message in messages %}
+            <div class="notification is-{{ category }} mb-2">
+              <button class="delete"></button>
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" static="true" action="{{ url_for('public.shipment_checkout') }}">
+      {{ form.hidden_tag() }}
+
+      <div class="columns is-variable is-6">
+        <div class="column is-half">
+          <div class="box">
+            <h2 class="title is-5 has-text-primary mb-4">
+              <i class="lni lni-file-pencil mr-2"></i>
+              {{ _('Billing details') }}
+            </h2>
+            
+            <div class="field-group">
+            <div class="columns">
+                
+                <!-- Billing Name -->
+                <div class="column is-half">
+                    <div class="field">
+                        <label class="label">
+                        <i class="lni lni-user-4 mr-1"></i>
+                        {{ _(form.billing_name.label) }}
+                        </label>
+                        <div class="control has-icons-left">
+                        {{ form.billing_name(class="input") }}
+                        <span class="icon is-small is-left">
+                            <i class="lni lni-user-4"></i>
+                        </span>
+                        </div>
+                        {% for error in form.billing_name.errors %}
+                        <p class="help is-danger">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Billing Lastname -->
+                <div class="column is-half">
+                    <div class="field">
+                        <label class="label">
+                        <i class="lni lni-user-4 mr-1"></i>
+                        {{ _(form.billing_lastname.label) }}
+                        </label>
+                        <div class="control has-icons-left">
+                        {{ form.billing_lastname(class="input") }}
+                        <span class="icon is-small is-left">
+                            <i class="lni lni-user-4"></i>
+                        </span>
+                        </div>
+                        {% for error in form.billing_lastname.errors %}
+                        <p class="help is-danger">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+
+
+              <div class="columns">
+                <div class="column is-three-quarters">
+                  <div class="field">
+                    <label class="label">{{ _(form.billing_street.label) }}</label>
+                    <div class="control">
+                      {{ form.billing_street(class="input") }}
+                    </div>
+                    {% for error in form.billing_street.errors %}
+                      <p class="help is-danger">{{ error }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+                <div class="column">
+                  <div class="field">
+                    <label class="label">{{ _(form.billing_number.label) }}</label>
+                    <div class="control">
+                      {{ form.billing_number(class="input") }}
+                    </div>
+                    {% for error in form.billing_number.errors %}
+                      <p class="help is-danger">{{ error }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="columns">
+                <div class="column is-one-third">
+                  <div class="field">
+                    <label class="label">{{ _(form.billing_postal_code.label) }}</label>
+                    <div class="control">
+                      {{ form.billing_postal_code(class="input") }}
+                    </div>
+                    {% for error in form.billing_postal_code.errors %}
+                      <p class="help is-danger">{{ error }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+                <div class="column">
+                  <div class="field">
+                    <label class="label">{{ _(form.billing_city.label) }}</label>
+                    <div class="control">
+                      {{ form.billing_city(class="input") }}
+                    </div>
+                    {% for error in form.billing_city.errors %}
+                      <p class="help is-danger">{{ error }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="columns">
+                <div class="column">
+                  <div class="field">
+                    <label class="label">
+                      <i class="lni lni-envelope-1 mr-1"></i>
+                      {{ _(form.billing_email.label) }}
+                    </label>
+                    <div class="control has-icons-left">
+                      {{ form.billing_email(class="input", type="email") }}
+                      <span class="icon is-small is-left">
+                        <i class="lni lni-envelope-1"></i>
+                      </span>
+                    </div>
+                    {% for error in form.billing_email.errors %}
+                      <p class="help is-danger">{{ error }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+                <div class="column">
+                  <div class="field">
+                    <label class="label">
+                      <i class="lni lni-phone mr-1"></i>
+                      {{ _(form.billing_phone.label) }}
+                    </label>
+                    <div class="control has-icons-left">
+                      {{ form.billing_phone(class="input", type="tel") }}
+                      <span class="icon is-small is-left">
+                        <i class="lni lni-phone"></i>
+                      </span>
+                    </div>
+                    {% for error in form.billing_phone.errors %}
+                      <p class="help is-danger">{{ error }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="label">{{ _(form.billing_fiscal_code.label) }}</label>
+                <div class="control">
+                  {{ form.billing_fiscal_code(class="input") }}
+                </div>
+                {% for error in form.billing_fiscal_code.errors %}
+                  <p class="help is-danger">{{ error }}</p>
+                {% endfor %}
+              </div>
+
+              <div class="columns">
+                <div class="column">
+                  <div class="field">
+                    <label class="label">{{ _(form.billing_country.label) }}</label>
+                    <div class="control" id="billing_country_control">
+                      {{ form.billing_country(class="input crs-country", id="billing_country", data_region_id="billing_region", data_value_type="short") }}
+                    </div>
+                    {% for error in form.billing_country.errors %}
+                      <p class="help is-danger">{{ error }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+                <div class="column">
+                  <div class="field">
+                    <label class="label">{{ _(form.billing_region.label) }}</label>
+                    <div class="control">
+                      {{ form.billing_region(class="input", id="billing_region") }}
+                    </div>
+                    {% for error in form.billing_region.errors %}
+                      <p class="help is-danger">{{ error }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-half">
+          <!-- Sezione Spedizione -->
+          <div class="box">
+            <div class="level mb-4">
+              <div class="level-left">
+                <div class="level-item">
+                  <h2 class="title is-5 has-text-primary">
+                    <i class="lni lni-truck-delivery-1 mr-2"></i>
+                    {{ _('Shipping address') }}
+                  </h2>
+                </div>
+              </div>
+              <div class="level-right">
+                <div class="level-item">
+                  <button type="button" class="button is-small is-light" onclick="copyBillingToShipping()">
+                    <span class="icon is-small">
+                      <i class="lni lni-clipboard"></i>
+                    </span>
+                    <span>{{ _('Copy from billing') }}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="field-group">
+              <div class="columns">
+                <div class="column">
+                  <div class="field">
+                    <label class="label">{{ _(form.shipping_name.label) }}</label>
+                    <div class="control">
+                      {{ form.shipping_name(class="input") }}
+                    </div>
+                    {% for error in form.shipping_name.errors %}
+                      <p class="help is-danger">{{ error }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+                <div class="column">
+                  <div class="field">
+                    <label class="label">{{ _(form.shipping_lastname.label) }}</label>
+                    <div class="control">
+                      {{ form.shipping_lastname(class="input") }}
+                    </div>
+                    {% for error in form.shipping_lastname.errors %}
+                      <p class="help is-danger">{{ error }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="columns">
+                <div class="column is-three-quarters">
+                  <div class="field">
+                    <label class="label">{{ _(form.shipping_street.label) }}</label>
+                    <div class="control">
+                      {{ form.shipping_street(class="input") }}
+                    </div>
+                    {% for error in form.shipping_street.errors %}
+                      <p class="help is-danger">{{ error }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+                <div class="column">
+                  <div class="field">
+                    <label class="label">{{ _(form.shipping_number.label) }}</label>
+                    <div class="control">
+                      {{ form.shipping_number(class="input") }}
+                    </div>
+                    {% for error in form.shipping_number.errors %}
+                      <p class="help is-danger">{{ error }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="columns">
+                <div class="column is-one-third">
+                  <div class="field">
+                    <label class="label">{{ _(form.shipping_postal_code.label) }}</label>
+                    <div class="control">
+                      {{ form.shipping_postal_code(class="input") }}
+                    </div>
+                    {% for error in form.shipping_postal_code.errors %}
+                      <p class="help is-danger">{{ error }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+                <div class="column">
+                  <div class="field">
+                    <label class="label">{{ _(form.shipping_city.label) }}</label>
+                    <div class="control">
+                      {{ form.shipping_city(class="input") }}
+                    </div>
+                    {% for error in form.shipping_city.errors %}
+                      <p class="help is-danger">{{ error }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="columns">
+                <div class="column">
+                  <div class="field">
+                    <label class="label">{{ _(form.shipping_country.label) }}</label>
+                    <div class="control" id="shipping_country_control">
+                      {{ form.shipping_country(class="input crs-country", id="shipping_country", data_region_id="shipping_region", data_value_type="short") }}
+                    </div>
+                    {% for error in form.shipping_country.errors %}
+                      <p class="help is-danger">{{ error }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+                <div class="column">
+                  <div class="field">
+                    <label class="label">{{ _(form.shipping_region.label) }}</label>
+                    <div class="control">
+                      {{ form.shipping_region(class="input", id="shipping_region") }}
+                    </div>
+                    {% for error in form.shipping_region.errors %}
+                      <p class="help is-danger">{{ error }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="label">
+                  <i class="lni lni-pencil-1 mr-1"></i>
+                  {{ _(form.shipping_notes.label) }}
+                </label>
+                <div class="control">
+                  {{ form.shipping_notes(class="textarea", rows="3", placeholder=_('Additional delivery instructions...')) }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pulsante di invio -->
+      <div class="has-text-centered mt-5">
+        <button class="button is-primary is-large" type="submit">
+            <span>{{ _('Continue to Shipping') }}</span>
+            <span class="icon">
+              <i class="lni lni-arrow-right"></i>
+            </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+// Fix form con valori predefiniti
+function fixForm() {
+  const change = new Event('change', { bubbles: true });
+
+  const shipping_country_selector = document.getElementById("shipping_country");
+  const billing_country_selector = document.getElementById("billing_country");
+
+  if (shipping_country_selector && shipping_country) {
+    shipping_country_selector.dispatchEvent(change);
+  }
+  
+  if (billing_country_selector && billing_country) {
+    billing_country_selector.dispatchEvent(change);
+  }
+}
+
+// Country-Region association logic
+function countryRegion(id) {
+  document.getElementById(`${id}_country_control`).addEventListener("change", (ev) => {
+    const region_selector = document.getElementById(`${id}_region`);
+    let old_val = region_selector.value;
+    let country = document.getElementById(`${id}_country`).value;
+    const regions = fetch(`/get_regions/${country}`,{
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
+      }
+    }).then(data => {
+      data.json().then( res => {
+        let regions = document.getElementById(`${id}_region`);
+        Array.from(regions.children).forEach(child => {
+          regions.removeChild(child);
+        })
+        res.forEach( region => {
+            let child = document.createElement("option");
+            child.value = region;
+            child.innerText = region;
+            regions.appendChild(child);
+        });
+        region_selector.value = old_val;
+      });
+    });
+  });
+}
+
+// Gestione dismissione notifiche
+document.addEventListener('DOMContentLoaded', () => {
+  const deleteButtons = document.querySelectorAll('.notification .delete');
+  deleteButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      button.parentElement.remove();
+    });
+  });
+  countryRegion("billing");
+  countryRegion("shipping");
+  fixForm();
+});
+
+// Copia dati fatturazione in spedizione
+function copyBillingToShipping() {
+  const billingFields = {
+    'billing_name': 'shipping_name',
+    'billing_lastname': 'shipping_lastname',
+    'billing_city': 'shipping_city',
+    'billing_postal_code': 'shipping_postal_code',
+    'billing_country': 'shipping_country',
+    'billing_region': 'shipping_region',
+    'billing_street': 'shipping_street',
+    'billing_number': 'shipping_number',
+  };
+
+  for (const [billing, shipping] of Object.entries(billingFields)) {
+    const billingField = document.querySelector(`[name="${billing}"]`);
+    const shippingField = document.querySelector(`[name="${shipping}"]`);
+    
+    if (billingField && shippingField) {
+      shippingField.value = billingField.value;
+      // Trigger change event for country/region selectors
+      if (shipping.includes('country') || shipping.includes('region')) {
+        shippingField.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+  }
+}
+</script>
+{% endblock %}

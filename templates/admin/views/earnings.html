@@ -1,0 +1,348 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Incassi{% endblock %}
+
+{% block content %}
+
+<style>
+    .gridjs-th-content {
+        width: fit-content !important;
+        min-width: none !important;
+        max-width: none !important;
+    }
+
+    .gridjs-td-id {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 3px;
+    }
+
+    #calendars {
+        margin: 0;
+    }
+
+    #link {
+        color: inherit;
+    }
+
+    #link:hover {
+        color: var(--bulma-link-text);
+    }
+
+</style>
+
+<div class="container">
+    <h1 class="title"><i class="lni lni-euro"></i> Incassi</h1>
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <div class="select">
+                    <select id="per_page">
+                        <option value="10">10 per pagina</option>
+                        <option value="25">25 per pagina</option>
+                        <option value="50">50 per pagina</option>
+                        <option value="100">100 per pagina</option>
+                    </select>
+                </div>
+            </div>
+            <div class="level-item">
+                <div class="select">
+                    <select id="period">
+                        <option value="1">giornaliero</option>
+                        <option value="7">settimanale</option>
+                        <option value="30">mensile</option>
+                        <option value="180">semestrale</option>
+                        <option value="365">annuale</option>
+                        <option value="0">da - a</option>
+                    </select>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="field" id="calendars" style="display: none;">
+            <div class="field-body">
+                <div class="field">
+                <div class="control">
+                    <input class="input" type="date" id="startDate" placeholder="Start Date">
+                </div>
+                </div>
+                <div class="field">
+                <div class="control">
+                    <input class="input" type="date" id="endDate" placeholder="End Date">
+                </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="level-right">
+            <div class="level-item">
+                <button type="button" class="button is-primary" onclick="downloadResults()">
+                    <i class="lni lni-download-1 lni-lg pr-1"></i>Scarica resoconto
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="orders"></div>
+    
+    <nav class="pagination is-centered mt-4" role="navigation" aria-label="pagination">
+        <ul class="pagination-list" id="pagination"></ul>
+    </nav>
+
+    <div id="totals"></div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+</body>
+<script type="text/javascript">
+let currentPage = 1;
+
+async function reloadTotalsTable() {
+    const period = document.getElementById('period').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    const response = await fetch(`/admin/earnings/totals?period=${period}&sd=${startDate}&ed=${endDate}`, {
+        method: "GET",
+    });
+    
+    if (response.status == 200) {
+        const data = await response.json();
+        
+        if (window.totalsGrid) {
+            window.totalsGrid.destroy();
+        }
+        document.getElementById("totals").innerHTML = "";
+        
+        window.totalsGrid = new gridjs.Grid({
+            columns: [
+                {
+                    name: 'Lordo prod.',
+                    id  : 'total_products_prices'
+                },            {
+                    name: 'Utile tot.',
+                    id  : 'base_products_prices'
+                },            {
+                    name: 'IVA tot.',
+                    id  : 'products_IVA'
+                },
+                {
+                    name: 'Lordo spe.',
+                    id  : 'total_shipping_costs'
+                },            {
+                    name: 'Base spe.',
+                    id  : 'base_shipping_costs'
+                },            {
+                    name: 'IVA spe.',
+                    id  : 'shipping_IVA'
+                },
+                {
+                    name: 'Valuta',
+                    id  : 'currency'
+                }
+            ],
+            data: data
+        }).render(document.getElementById('totals'));
+    }
+}
+
+async function reloadEarningsTable(page = 1) {
+    currentPage = page;
+    const perPage = document.getElementById('per_page').value;
+    const period = document.getElementById('period').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+
+    const response = await fetch(`/admin/earnings/list?period=${period}&page=${page}&per_page=${perPage}&sd=${startDate}&ed=${endDate}`, {
+        method: "GET",
+    });
+    
+    if (response.status == 200) {
+        const json = await response.json();
+        ( { data, pagination } = json);
+        
+        if (window.ordersGrid) {
+            window.ordersGrid.destroy();
+        }
+        document.getElementById("orders").innerHTML = "";
+        
+        window.ordersGrid = new gridjs.Grid({
+            columns: [
+                {
+                    name: 'ID',
+                    id: 'id',
+                    formatter: ((cell, row, element) => {
+                        document.querySelectorAll(`td[data-column-id="${element.id}"]`).forEach((el) => {
+                            el.children[0].classList.add("gridjs-td-id");
+                        });
+                        const id = cell;
+                        return gridjs.html(`<a id="link" href="/admin/order/${id}/edit"><i class="lni lni-link-2-angular-right"></i></a>${id}`);
+                    }),
+
+                },
+                {
+                    name: 'Prezzo prod.',
+                    id: 'products_price',
+                },
+                {
+                    name: 'Prezzo base',
+                    id: 'products_base_price',
+                },
+                {
+                    name: 'IVA prod.',
+                    id: 'products_IVA',
+                },
+                {
+                    name: 'Costo sped.',
+                    id: 'shipment_price',
+                },
+                {
+                    name: 'Costo base',
+                    id: 'shipment_base_price',
+                },
+                {
+                    name: 'IVA sped.',
+                    id: 'shipment_IVA',
+                },
+                {
+                    name: 'Valuta',
+                    id: 'currency',
+                },
+                {
+                    name: 'Data',
+                    id: 'created_at',
+                    formatter: ((cell) => {
+                        return cell.split('T')[0];
+                    }),
+                    attributes: (() => {
+                        return {
+                            style: "width: 131px"
+                        }
+                    })
+                },
+            ],
+            data: data,
+
+        }).render(document.getElementById('orders'));
+        reloadTotalsTable();
+
+        updatePagination(pagination);
+    }
+
+}
+
+
+
+function updatePagination(p) {
+    const paginationList = document.getElementById('pagination');
+    paginationList.innerHTML = '';
+    
+    // Previous page
+    if (p.page > 1) {
+        paginationList.innerHTML += `
+            <li>
+                <a class="pagination-link" aria-label="Goto page ${p.page - 1}" 
+                   onclick="reloadEarningsTable(${p.page - 1})">
+                    <span class="icon"><i class="lni lni-chevron-left"></i></span>
+                </a>
+            </li>
+        `;
+    }
+    
+    // Page numbers
+    for (let i = 1; i <= p.pages; i++) {
+        if (
+            i === 1 || 
+            i === p.pages || 
+            (i >= p.page - 2 && i <= p.page + 2)
+        ) {
+            paginationList.innerHTML += `
+                <li>
+                    <a class="pagination-link ${i === p.page ? 'is-current' : ''}" 
+                       aria-label="Goto page ${i}"
+                       onclick="reloadEarningsTable(${i})">
+                        ${i}
+                    </a>
+                </li>
+            `;
+        } else if (
+            i === p.page - 3 || 
+            i === p.page + 3
+        ) {
+            paginationList.innerHTML += `
+                <li><span class="pagination-ellipsis">&hellip;</span></li>
+            `;
+        }
+    }
+    
+    // Next page
+    if (p.page < p.pages) {
+        paginationList.innerHTML += `
+            <li>
+                <a class="pagination-link" aria-label="Goto page ${p.page + 1}" 
+                   onclick="reloadEarningsTable(${p.page + 1})">
+                    <span class="icon"><i class="lni lni-chevron-left" style="rotate:180deg"></i></span>
+                </a>
+            </li>
+        `;
+    }
+}
+
+async function downloadResults() {
+    const period = document.getElementById('period').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+
+    const a = document.createElement("a");
+    a.href = `/admin/earnings/download?period=${period}&sd=${startDate}&ed=${endDate}`
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    reloadEarningsTable(1);
+    let startDate = document.getElementById('startDate');
+    let endDate = document.getElementById('endDate');
+    document.getElementById('period').addEventListener('change', (ev) => {
+        if (ev.target.value != 0) {
+            document.getElementById('calendars').style.display = "none";
+        } else {
+            document.getElementById('calendars').style.display = "unset";
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('startDate').value = `${yyyy}-${mm}-${dd}`;
+            document.getElementById('startDate').max = `${yyyy}-${mm}-${dd}`;
+            document.getElementById('endDate').value = `${yyyy}-${mm}-${dd}`;
+        };
+        reloadEarningsTable(1)
+    });
+    startDate.addEventListener('click', (ev) => {
+        ev.target.max = document.getElementById('endDate').value;
+    });
+
+    endDate.addEventListener('click', (ev) => {
+        ev.target.min = document.getElementById('startDate').value;
+    });
+
+    startDate.addEventListener('change', (ev) => {
+        reloadEarningsTable(1);
+    });
+
+    endDate.addEventListener('change', (ev) => {
+        reloadEarningsTable(1);
+    });
+
+    document.getElementById('per_page').addEventListener('change', () => reloadEarningsTable(1));
+});
+
+</script>
+{% include 'admin/views/orders/javascript.html'%}
+{% endblock %}

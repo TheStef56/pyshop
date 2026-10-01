@@ -1,0 +1,310 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div>
+      {% for category, message in messages %}
+        <div class="notification mb-2 is-{{ category }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="my-2 is-flex is-justify-content-space-between">
+    <input form="back" type="submit" class="button is-light" value="Indietro">
+    <input form="variant" type="submit" class="button is-success" value="Salva">
+</div>
+
+<div class="my-4">
+    <h1>{{product.name['it']}}</h1>
+    <hr>
+    <p>{{product.description['it'] | safe}}</p>
+</div>
+
+<form id="back" static="true" action="/admin/product/{{product.id}}/edit"></form>
+<form id="variant" static="true" method="POST" action="/admin/product/{{product.id}}/variant/{% if variant.id is none %}store{%else%}{{variant.id}}/update{%endif%}" enctype="multipart/form-data">
+    <section class="">
+        <input type="hidden" name="product" value="{{product.id}}">
+        
+        <!-- Nome -->
+        <div class="columns">
+            <div class="column is-half">
+                <div class="field">
+                    <label class="label is-flex is-justify-content-space-between">Nome (IT) <button type="button" onclick="autoTranslate(`[name='name[it]']`,`[name='name[en]']`, 'it', 'en')" class="button is-small"><i class="lni lni-refresh-circle-1-clockwise"></i> Traduci</button></label>
+                    <div class="control">
+                        <input type="text" class="input" name="name[it]" value="{{variant.name['it']}}" required>
+                    </div>
+                </div>
+            </div>
+            <div class="column is-half">
+                <div class="field">
+                    <label class="label is-flex is-justify-content-space-between">Nome (EN) <button type="button"  onclick="autoTranslate(`[name='name[en]']`,`[name='name[it]']`, 'en', 'it')" class="button is-small"><i class="lni lni-refresh-circle-1-clockwise"></i> Traduci</button></label>
+                    <div class="control">
+                        <input type="text" class="input" name="name[en]" value="{{variant.name['en']}}" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Descrizione -->
+        <div class="columns">
+            <div class="column is-half">
+                <div class="field">
+                    <label class="label is-flex is-justify-content-space-between">Descrizione (IT) <button type="button" class="button is-small"  onclick="autoTranslate(`[name='description[it]']`,`[name='description[en]']`, 'it', 'en')" ><i class="lni lni-refresh-circle-1-clockwise"></i> Traduci</button></label>
+                    <div class="control">
+                        <div id="editor_description_it" class="pell"></div>
+                        <input type="hidden" name="description[it]" id="description_it">
+                    </div>
+                </div>
+            </div>
+            <div class="column is-half">
+                <div class="field">
+                    <label class="label is-flex is-justify-content-space-between">Descrizione (EN) <button type="button" class="button is-small" onclick="autoTranslate(`[name='description[en]']`,`[name='description[it]']`, 'en', 'it')"><i class="lni lni-refresh-circle-1-clockwise"></i> Traduci</button></label>
+                    <div class="control">
+                        <div id="editor_description_en" class="pell"></div>
+                        <input type="hidden" name="description[en]" id="description_en">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prezzi -->
+        <div class="columns">
+            <div class="column is-half">
+                <div class="field">
+                    <label class="label">Prezzo €</label>
+                    <div class="control">
+                        <input type="number" class="input" step="0.01" name="price[eur]" value="{{variant.price['eur'] if variant.price['eur'] else '0'}}" required>
+                    </div>
+                </div>
+            </div>
+            <div class="column is-half">
+                <div class="field">
+                    <label class="label">Prezzo $</label>
+                    <div class="control">
+                        <input type="number" class="input" step="0.01" name="price[usd]" value="{{variant.price['usd'] if variant.price['usd'] else '0'}}" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sconti -->
+        <div class="columns">
+            <div class="column is-half">
+                <div class="field">
+                    <label class="label">Sconto % (EUR) <small>verrà detratto automaticamente dal prezzo</small></label>
+                    <div class="control has-icons-right">
+                        <input type="number" class="input" name="discount[eur]" value="{{ variant.discount['eur'] if variant.discount['eur'] else '0'}}" step="0.01" min="0" max="100" placeholder="es. 10">
+                        <span class="icon is-small is-right">
+                        %
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="column is-half">
+                <div class="field">
+                    <label class="label">Sconto % (USD) <small>verrà detratto automaticamente dal prezzo</small></label>
+                    <div class="control has-icons-right">
+                        <input type="number" class="input" name="discount[usd]" value="{{ variant.discount['usd'] if variant.discount['usd'] else '0' }}" step="0.01" min="0" max="100" placeholder="es. 10">
+                        <span class="icon is-small is-right">
+                        %
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock -->
+        <div class="field">
+            <label class="label">Stock</label>
+            <div class="control">
+                <input type="number" class="input" step="1" name="stock" value="{{variant.stock if variant.stock else '0'}}" min="0" required>
+            </div>
+        </div>
+
+        <!-- Sezione Immagini a tutta larghezza -->
+        <div class="field">
+            <label class="label">Immagini</label>
+            <div class="control">
+                <input class="input" type="file" name="images" accept="image/*" multiple>
+            </div>
+        </div>
+    </section>
+</form>
+
+<div id="images" class="columns is-multiline mt-4">
+    {% if variant and not variant.images is none %}
+        {% for image, src in variant.images.items() %}
+            <div id="image_{{image}}" class="column is-one-quarter">
+                <div class="card">
+                    <div class="card-image">
+                    <figure class="image is-4by3">
+                        <img src="{{ src['path'] }}" alt="{{ image }}" style="width: 100%; height: 180px; object-fit: cover;">
+                    </figure>
+                    </div>
+                    <footer class="card-footer">
+                        <button type="button" class="button is-danger is-fullwidth card-footer-item" onclick="deleteImage('{{image}}')">Elimina</button>
+                    </footer>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<div>
+    <table class="table" >
+        <thead>
+            <td>Attivo</td>
+            <td>Nome IT</td>
+            <td>Nome EN</td>
+            <td>Sconto €</td>
+            <td>Sconto $</td>
+            <td>Prezzo €</td>
+            <td>Prezzo $</td>
+            <td>Stock</td>
+            <td></td>
+        </thead>
+        <tbody id="options">
+        {% if variant and not variant.options is none %}
+            {% for option in variant.options %}
+                {% with id = option %}
+                    {% with option_data = variant.options[option] %}
+                    <tr id="option_{{id}}">
+                        {% include 'admin/views/options/edit.html' %}
+                    </tr>
+                    {% endwith %}
+                {% endwith %}
+            {% endfor %}
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+{% if variant.id %}
+    <button type="button" class="button is-primary mt-2" onclick="createOption()">Aggiungi opzione</button>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{#-TODO: rendere statico-#}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script type="text/javascript">
+    async function randHash256() {
+        const randBytes = new Uint8Array(32);
+        crypto.getRandomValues(randBytes);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", randBytes);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+        return hashHex;
+    }
+
+    function updateInputOrders() {
+        document.querySelectorAll('.option_order').forEach((element, index) => {
+            element.value = index + 1;
+            element.parentElement.querySelectorAll('input').forEach((input) => {
+                input.addEventListener("change", () => {
+                    console.log("here");
+                    input.setAttribute('value', input.value);
+                });
+            });
+        });
+    }
+
+    async function cloneOption(id) {
+        const original = document.getElementById(`option_input_${id}`).parentElement;
+        if (!original) return null;
+
+        const newId = await randHash256();
+
+        // prendi l'HTML del clone
+        let html = original.outerHTML;
+
+        // sostituisci tutti i riferimenti al vecchio id con il nuovo
+        const regex = new RegExp(`${id}`, "g");
+        html = html.replace(regex, `${newId}`);
+
+        // crea un nuovo nodo dal nuovo HTML
+        const template = document.createElement("template");
+        template.innerHTML = html.trim();
+        const clone = template.content.firstChild;
+
+        // inserisci dopo l'originale
+        original.insertAdjacentElement("afterend", clone);
+        updateInputOrders();
+        return clone;
+    }
+
+    async function createOption() {
+        const response = await fetch('/admin/product/{{product.id}}/variant/{{variant.id}}/option', {method: 'GET'})
+        if (response.status == 200) {
+            var tr = document.createElement('tr');
+            tr.innerHTML = await response.text()
+            document.getElementById('options').appendChild(tr)
+            updateInputOrders();
+            return
+        }
+        window.notyf.error("Un errore ha impedito l'aggiunta del colore")
+    }
+
+    async function deleteOption(option_id) {
+        document.querySelector(`#option_input_${option_id}`).parentElement.remove()
+    }
+
+    async function deleteImage(key) {
+        const response = await fetch(`/admin/product/{{product.id}}/variant/{{variant.id}}/${key}/deleteimage`, { method: 'DELETE'})
+        if (response.status == 200) {
+            document.getElementById(`image_${key}`).remove()
+            window.notyf.success('Immagine rimossa correttamente')
+            return
+        }
+        window.notyf.error('Un errore ha impedito la rimozione dell\'immagine')
+    }
+    
+    new Sortable(document.querySelector("#options"), {
+        animation: 150,
+        ghostClass: "riga-ombra", 
+        onEnd: function () {
+            setTimeout(() => {
+                updateInputOrders();
+            }, 150);
+        }
+    });
+
+    {% if variant.id %}
+    new Sortable(document.querySelector("#images"), {
+        animation: 150,
+        ghostClass: "riga-ombra",
+        onEnd: async function (evt) {
+            const ordered_images = [];
+            document.querySelectorAll("#images > div[id^='image_']").forEach((el, index) => {
+                const id = el.id.replace("image_", "");
+                ordered_images.push({ id: id, order: index + 1 });
+            });
+            const response = await fetch(
+                `{{url_for('admin_products.order_images', product_id=product.id, variant_id=variant.id)}}`, { 
+                    method: 'PUT',
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(ordered_images)
+                } 
+            )
+            if (response.status == 200) {
+                window.notyf.success('Immagini ordinate correttamente')
+                return
+            }
+            window.notyf.error('Un errore ha impedito il riordinamento delle immagini')
+        }
+    });
+    {% endif %}
+
+    initPell('editor_description_it', 'description_it', `{{variant.description['it']|safe}}`);
+    initPell('editor_description_en', 'description_en', `{{variant.description['en']|safe}}`);
+
+    </script>
+<style>
+.riga-ombra {
+  background-color: #ffe8a1;
+}
+</style>
+{% endblock %}

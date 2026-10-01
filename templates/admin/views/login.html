@@ -1,0 +1,101 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Login - {{session['settings']['header']['site_name']}}{% endblock %}
+
+{% block content %}
+    <style>
+        #recovery-links {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        a {
+            color: inherit;
+        }
+
+        a:hover {
+            color: var(--bulma-link-text);
+        }
+    </style>
+    <div class="columns is-centered">
+        <div class="column is-one-third">
+            <h2 class="title is-2 has-text-centered">Login</h2>
+            
+            <div id="notifications">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div>
+                    {% for category, message in messages %}
+                    <div class="notification is-{{ category }} mb-2">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+            </div>
+
+            <form method="POST" action="{{ url_for('login.admin_login') }}" static="true">
+                <div class="field">
+                    <label class="label" for="username">Username:</label>
+                    <div class="control">
+                        <input class="input" type="text" id="username" name="username" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label" for="password">Password:</label>
+                    <div class="control">
+                        <input class="input" type="password" id="password" name="password" required>
+                    </div>
+                    <div id="recovery-links">
+                        <a href="#" id="recovery">forgot password?</a>
+                        <a href="#" id="reset" {% if max_attempts != True %} hidden=True {% endif %}>reset attempts</a>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="control has-text-centered">
+                        <button class="button is-primary is-fullwidth" type="submit">Login</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+        function emailRequestTemplate (type) {
+            const user = document.getElementById('username').value
+            if (!user) {
+                let title = document.getElementById('notifications');
+                title.innerHTML = '<div><div class="notification is-danger mb-2">Username must be provided</div></div>';
+                return;
+            }
+            fetch(`/admin/recoverymail?type=${type}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: user
+                })
+            }).then(() => {
+                window.location.reload();
+            })
+        }
+
+        function addmailevents () {
+            document.getElementById('reset').addEventListener('click', () => {
+                emailRequestTemplate('attempts');
+            })
+            document.getElementById('recovery').addEventListener('click', () => {
+                    emailRequestTemplate('password')
+            })
+        }
+        
+        document.addEventListener("DOMContentLoaded", () => {
+            addmailevents()
+        });
+        
+    </script>
+{% endblock %}

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <title>{% block title %}{{session['settings']['header']['site_name']}}{% endblock %}</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="index, follow">
+    <meta name="description" content="{{ session['settings']['header']['site_description']}} ">
+ 
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notyf.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mermaid.min.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/pell/dist/pell.min.css">
+    {% if session['backoffice-theme'] == 'dark'%}
+        <link rel="stylesheet" href="{{ url_for('static', filename='bulma/css/bulma.css') }}">
+        {% else %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='bulma/css/versions/bulma-no-dark-mode.min.css') }}">
+    {% endif %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='lineicons/css/icons.css') }}">
+    {#TODO: convertire in file static#}
+    <script src="https://unpkg.com/pell/dist/pell.min.js"></script>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+    <!-- PNG favicons for different resolutions -->
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512x512.png">
+    <link rel="icon" type="image/png" sizes="256x256" href="/favicon-256x256.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="/favicon-128x128.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+
+    <!-- Apple touch icons for iOS devices -->
+    <link rel="apple-touch-icon" sizes="512x512" href="/favicon-512x512.png">
+    <link rel="apple-touch-icon" sizes="256x256" href="/favicon-256x256.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/favicon-192x192.png">
+    <link rel="apple-touch-icon" sizes="128x128" href="/favicon-128x128.png">
+
+    <!-- Android / Chrome icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
+
+    {% block head %}{% endblock %}
+    <style>
+        .icon-row {
+            display: flex !important;
+            gap: 5px;
+            align-items: center;
+        }
+    </style>
+
+</head>
+<body>
+    <section class="hero is-fullheight">
+        <div class="hero-body">
+            <div class="container is-fullheight" style="height: 100%;">
+                <header>
+                    <nav>
+                        <!-- Navigation bar -->
+                    </nav>
+                </header>
+
+                <div class="columns">
+                    <!-- Sidebar -->
+                    {% if user %}
+                    <div class="column is-one-quarter">
+                        <aside class="menu">
+                            <p class="menu-label">Generale</p>
+                            <ul class="menu-list">
+                                {% if user and user.has_permission('view_users') %}
+                                    <li>
+                                        <a class="icon-row" href="{{ url_for('admin_users.view') }}">
+                                            <i class="lni lni-user-4"></i> Utenti
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                {% if user and user.has_permission('view_products') %}
+                                    <li>
+                                        <a class="icon-row" href="{{ url_for('admin_products.admin_products') }}">
+                                            <i class="lni lni-cart-1"></i> Prodotti
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                {% if user and user.has_permission('view_orders') %}
+                                    <li>
+                                        <a class="icon-row" href="{{ url_for('admin_orders.view') }}">
+                                            <i class="lni lni-agenda"></i> Ordini
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                {% if user and user.has_permission('view_earnings') %}
+                                    <li>
+                                        <a class="icon-row" href="{{ url_for('admin_earnings.view') }}">
+                                            <i class="lni lni-euro"></i> Incassi
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                {% if user and user.has_permission('view_categories') %}
+                                    <li>
+                                        <a class="icon-row" href="{{ url_for('admin_categories.view') }}">
+                                            <i class="lni lni-folder-1"></i> Categorie
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                {% if user and user.has_permission('view_labels') %}
+                                    <li>
+                                        <a class="icon-row" href="{{ url_for('labels.view') }}">
+                                            <i class="lni lni-label-dollar-2"></i> Marche
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                <!---
+                                <li><a href="#">Ruoli</a></li>
+                                -->
+                            </ul>
+                            <p class="menu-label">Altro</p>
+                            <ul class="menu-list">
+                                {% if user.has_permission('edit_settings') %}
+                                    <li><a class="icon-row" href="{{url_for('admin_settings.edit')}}"> <i class="lni lni-brush-2"> </i>Impostazioni</a></li>
+                                {% endif %}
+                                {% if session['backoffice-theme'] == 'dark'%}
+                                <li><a class="icon-row" href="{{url_for('admin_settings.change_theme', theme='ligth')}}"><i class="lni lni-sun-1"></i>Tema chiaro</a></li>
+                                {% else %}
+                                <li><a class="icon-row" href="{{url_for('admin_settings.change_theme', theme='dark')}}"><i class="lni lni-moon-half-right-5"></i>Tema scuro</a></li>
+                                {% endif %}
+                                <li><a href="/admin/changepassword" class="icon-row"><i class="lni lni-locked-2"></i>Cambia password</a></li>
+                                <li><a href="/admin/logout" class="has-text-danger">Logout</a></li>
+                            </ul>
+                        </aside>
+                    </div>
+                    {% endif %}
+
+                    <!-- Main content -->
+                    <div class="column">
+                        <div class="container is-fullheight">
+                            {% block content %}
+                            <!-- Qui va il contenuto specifico di ogni pagina -->
+                            {% endblock %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="content has-text-centered">
+                © 2025 {{session['settings']['header']['site_name']}}
+            </div>
+        </footer>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+    <script>
+        window.notyf = new Notyf();
+    </script>
+    <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/form_manager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modal_manager.js') }}"></script>
+    <script type="text/javascript">
+
+        const event = new Event("input", { bubbles: true, cancelable: true });
+
+        function preventMarkupPasting(element) {
+            element.addEventListener('paste', async function(e) {
+                e.preventDefault();
+                const pastedText = e.clipboardData.getData('text/plain');
+                
+                const selection = window.getSelection();
+                if (!selection.rangeCount) return;
+                
+                const range = selection.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(document.createTextNode(pastedText));
+                
+                range.setStartAfter(range.endContainer);
+                range.collapse(true);
+                selection.removeAllRanges();
+                selection.addRange(range);
+                element.dispatchEvent(event);
+            });
+        }
+
+        window.editors = {}
+        function initPell(id, inputId, initialContent = '') {
+            const element = document.getElementById(id);
+            if (!element) return;
+
+            const editor = pell.init({
+                element: element,
+                onChange: html => {
+                    const input = document.getElementById(inputId);
+                    if (input) input.value = html;
+                },
+                actions: [
+                    'bold',
+                    'italic',
+                    'underline',
+                    'link',
+                    'olist',
+                    'ulist',
+                    'code',
+                    'paragraph'
+                ],
+                defaultParagraphSeparator: 'p'
+            });
+
+            if (initialContent) {
+                editor.content.innerHTML = initialContent;
+                const input = document.getElementById(inputId);
+                if (input) input.value = initialContent;
+            }
+            window.editors[inputId] = editor
+            preventMarkupPasting(editor.content);
+        }
+
+        async function autoTranslate(fromSelector, toSelector, sourceLang, targetLang) {
+            const fromEl = document.querySelector(fromSelector);
+            const toEl = document.querySelector(toSelector);
+
+            if (!fromEl || !toEl) {
+                console.error("Input non trovato con i selettori forniti.");
+                return;
+            }
+
+            const text = fromEl.value.trim();
+            if (!text) {
+                window.notyf.error("Il campo selezionato per la traduzione è vuoto");
+                return;
+            }
+
+            try {
+                if (toEl.tagName == "INPUT") {
+                    toEl.parentElement.classList.add('is-loading')
+                }
+                const response = await fetch(`{{url_for('admin.translate')}}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        q: text,
+                        source: sourceLang,
+                        target: targetLang,
+                        format: "html"
+                    })
+                });
+
+                const data = await response.json();
+                const translated = data?.translatedText || "";
+
+                // aggiorna il campo di destinazione
+                toEl.value = translated;
+
+                // aggiorna l'editor Pell se esiste
+                if (toEl.getAttribute('id')) {
+                    const element_id = toEl.getAttribute('id');
+                    if (window.editors && window.editors[element_id]) {
+                        window.editors[element_id].content.innerHTML = translated;
+                    }
+                }
+
+            } catch (err) {
+                console.error("Errore durante la traduzione:", err);
+                toEl.value = "";
+            } finally {
+                if (toEl.tagName == 'INPUT') {
+                    toEl.parentElement.classList.remove('is-loading')
+                }
+            }
+        }
+
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

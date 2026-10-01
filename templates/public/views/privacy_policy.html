@@ -1,0 +1,10 @@
+{% extends "public/base.html" %}
+
+{% block content %}
+<section class="section">
+  <div class="container content">
+    <h1 class="title">{{ _('Privacy Policy') }}</h1>
+        {{privacy_policy | safe}}
+  </div>
+</section>
+{% endblock %}

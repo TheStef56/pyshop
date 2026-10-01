@@ -1,0 +1,261 @@
+{% extends "public/base.html" %}
+
+{% block content %}
+<style>
+.discount-badge {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background-color: #ff3860;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    font-size: 0.85rem;
+    z-index: 10;
+}
+.image.is-relative {
+    position: relative;
+}
+
+.image {
+    cursor: pointer;
+}
+
+#root {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%; 
+    height: 100%;
+    background: rgba(0,0,0,0.7); 
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+#zoomed {
+    user-select: none;
+    max-height: 85vh;
+}
+
+#image-container {
+    position: relative;
+    width: fit-content;
+    height: fit-content;
+    margin-top: 10vh;
+    max-height: 85vh;
+    max-width: 90vw;
+}
+
+.x {
+    position: absolute;
+    font-size: 48px;
+    color: white;
+    margin-top: 5%;
+    right: 50px;
+    cursor: pointer;
+}
+
+.xb {
+    font-weight:900;
+    font-size: 50px;
+    color: black;
+    top: -2px;
+    right: 49px;
+}
+
+.mx-auto {
+    min-width: 42px !important;
+}
+
+.is-flex {
+    flex-wrap: wrap !important;
+}
+
+</style>
+
+<div class="main-container">
+    <div class="container">
+        <div class="columns">
+            {% if categories %}
+            <div class=" pt-6 column is-12-mobile is-4-tablet is-3-desktop m-0 p-0">
+                {% include 'public/shared/sidebar.html' %}
+            </div>
+            {% endif %}
+            <div class="column m-0 p-0
+                {% if categories %}
+                is-12-mobile is-8-tablet is-9-desktop
+                {% endif %}
+                ">
+                <section class="section pt-5">
+                    <div class="container">
+                        <div class="columns is-vcentered is-multiline">
+                            <!-- Immagine del prodotto -->
+                            <div class="column is-12-touch is-6-desktop">
+                                <div class="swiper product-swiper">
+                                    <div class="swiper-wrapper">
+                                    {% if variant.images %}
+                                        {% for key, img in variant.images.items() %}
+                                            <div class="swiper-slide">
+                                                <figure style="max-width:300px" class="image is-rounded mx-auto is-relative">
+                                                    
+                                                    {# Badge sconto se presente #}
+                                                    {% if variant.discount[session['currency']] | float != 0.0%}
+                                                    <div class="discount-badge">
+                                                    -{{ variant.discount[session['currency']] }}%
+                                                    </div>
+                                                    {% endif %}
+
+                                                    <img src="{{ img['path'] }}" alt="Product Image" onclick="zoomImage('{{ img['path'] }}')">
+                                                </figure>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="swiper-pagination"></div>
+                                </div>
+                        </div>
+
+                        <!-- Info prodotto -->
+                        <div class="column is-12-touch is-6-desktop">
+                            <h1 class="title is-3">
+                                {{ product.name[session['lang']] }}
+                                {% if current_option %}
+                                    - {{ variant.options[current_option]["name"][session['lang']] if variant.options[current_option]["name"][session['lang']] != "" else variant.options[current_option]["name"]['it'] }}
+                                {% endif %}
+                            </h1>
+                            <div class="pb-5">
+                                {% if variant.name[session['lang']]  %}
+                                <span>
+                                    <b>{{ variant.name[session['lang']] if (variant.options and variant.options[current_option]["name"][session['lang']] != "") else variant.name['it'] }}</b>
+                                </span><br>
+                                {% endif %}
+                                <span><b>{{_('price')}}:</b>
+                                    {% if variant.discount[session['currency']] | float != 0.0 %}
+                                        <s class="mr-2">{{Variant.from_dict(variant, true).get_original_price(session, 1, current_option)}}</s>
+                                        <span class="has-text-danger">{{Variant.from_dict(variant, true).get_price(session, 1, current_option)}}</span>
+                                    {% else %}
+                                        {{Variant.from_dict(variant, true).get_price(session, 1, current_option)}}
+                                    {% endif %}
+                                </span><br>
+
+                                <span><b>{{_('in stock')}}:</b> {{variant.stock}}<span><br>
+                                {% if global_settings.meta.get('contacts', None) and variant.stock <= 0 %}
+                                    <a href="{{url_for('public.contacts')}}" class="button is-warning is-rounded mt-2 mb-2">
+                                        <i class="lni lni-basket-shopping-3 mr-2"></i>
+                                        <span>{{_('Order now')}}</span>
+                                    </a><br>
+                                {% endif %}
+                                {% if global_settings and global_settings.meta.get('open', 'closed') == 'open' %}
+                                    <button {% if variant.stock <= 0 %} disabled {% endif %} type="button" class="button is-rounded is-primary mt-2" onclick="addToCart('{{variant.id}}', '{{current_option}}')">
+                                        <i class="dark-icon lni lni-cart-2 mr-2"></i> 
+                                            {% if variant.stock <= 0 %} 
+                                                <span>{{_('Out of stock')}}</span> 
+                                            {% else %} 
+                                                <span>{{_('Add to cart')}}</span> 
+                                            {% endif %}
+                                        </button>
+                                    <br>
+                                {% endif %}
+                                </div>
+                            <div class="is-flex">
+                                {% for alternative in product.variants %}
+                                    <div class="has-text-centered pr-4 pt-2">
+                                        <a href="{{alternative.get_page_url()}}" class="{% if alternative.id != variant.id %}is-active{% endif %}">
+                                            <figure  class="mx-auto image">
+                                                <img style="max-width: 64px; max-height:64px;" src="{{ alternative.first_image()['path'] }}" alt="{{ alternative.name[session['lang']] }}">
+                                            </figure>
+                                        </a>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            {% if variant.options %}
+                            <div>
+                                {% for option in variant.options %}
+                                    {% if variant.options[option]['active']%}
+                                        <a href="{{ url_for('public.product_variant_option', product_id=product.id, variant_id=variant.id, option_id=option) }}" class="button is-rounded mt-4 mr-1 {% if option == current_option %}is-link{%else%}is-muted{% endif %}">
+                                            {{ variant.options[option]["name"][session['lang']] if variant.options[option]["name"][session['lang']] != '' else variant.options[option]["name"]['it'] }}
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        </div>
+                    </div>
+                </section>
+                <div class="p-4">
+                    {% if product.label and product.label.image %}
+                    <div class="px-4">
+                        <img style="height: 32px;" src="{{url_for('static', filename=product.label.image)}}">
+                    </div>
+                    {% endif %}
+                    <p class="content">{{ product.description[session['lang']]|safe}}</p>
+                    {% if variant.description[session['lang']]%}
+                        <hr>
+                        <p class="content">{{variant.description[session['lang']]|safe}}</p>
+                    {% endif %}
+
+                    {% if product.more_info != None and product.more_info != '' %}
+                        <a class="is_link" target="_blank" href="{{product.more_info}}">{{_('More info')}}</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+new Swiper('.product-swiper', {
+  loop: true,
+  pagination: {
+    el: '.swiper-pagination',
+    clickable: true,
+  },
+});
+
+function zoomImage(image) {
+    let root = document.createElement('div');
+    let container = document.createElement('div');
+    let zoomed = document.createElement('img');
+    let x = document.createElement('i');
+    let xb = document.createElement('i');
+
+    let close = () => {
+        document.getElementById('root').remove();
+    };
+
+    container.id = 'image-container';
+
+    xb.className = "lni lni-xmark x xb";
+    xb.style.zIndex = 2;
+    x.className = "lni lni-xmark x";
+    x.style.zIndex = 3;  
+    x.onclick = close;
+
+    zoomed.src = image;
+    zoomed.id = 'zoomed';
+    zoomed.onclick = (event) => {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+    }
+
+    root.id = 'root';
+    root.onclick = close;
+    
+    container.appendChild(zoomed);
+    container.appendChild(xb);
+    container.appendChild(x);
+    root.appendChild(container);
+    document.body.appendChild(root);
+}
+
+</script>
+{% endblock %}

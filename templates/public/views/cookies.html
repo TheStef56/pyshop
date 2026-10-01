@@ -1,0 +1,32 @@
+{% extends "public/base.html" %}
+
+{% block content %}
+<section class="section">
+  <div class="container content">
+    <h1 class="title">{{ _('Cookie Policy') }}</h1>
+
+    <p>{{ _('Last updated:') }} {{_('August 01 2025')}}</p>
+
+    <p>{{ _('At') }} <strong>{{session['settings']['header']['site_name']}}</strong>, {{ _('we use cookies to ensure the proper functioning of our website and to provide you with the best possible experience. This Cookie Policy explains what cookies are, which ones we use, and your choices regarding cookies.') }}</p>
+
+    <h2 class="subtitle">{{ _('What are cookies?') }}</h2>
+    <p>{{ _('cookies are small text files stored on your device when you visit a website. They help websites remember information about your visit, such as your preferences or login status.') }}</p>
+
+    <h2 class="subtitle">{{ _('Which cookies do we use?') }}</h2>
+    <p>{{ _('We use only') }} <strong>{{ _('technical cookies') }}</strong> {{ _('that are strictly necessary for the operation of our website. These cookies enable basic functions such as page navigation, secure login, and shopping cart functionality.') }}</p>
+    
+    <ul>
+      <li><strong>{{ _('Session cookies:') }}</strong> {{ _('These cookies keep track of your session and expire when you close your browser.') }}</li>
+    </ul>
+
+    <h2 class="subtitle">{{ _('Do we use third-party cookies?') }}</h2>
+    <p>{{ _('No, we do not use any third-party cookies, tracking or advertising cookies.') }}</p>
+
+    <h2 class="subtitle">{{ _('Your choices regarding cookies') }}</h2>
+    <p>{{ _('Since we use only essential technical cookies, there is no need to give consent to use our site. You can configure your browser to block or delete cookies; however, this may affect the functionality of our website.') }}</p>
+
+    <h2 class="subtitle">{{ _('More information') }}</h2>
+    <p>{{ _('If you have any questions about our use of cookies, please') }} <a href="mailto:{{support_mail}}">{{ _('contact us') }}</a>.</p>
+  </div>
+</section>
+{% endblock %}

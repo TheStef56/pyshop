@@ -1,0 +1,156 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="title is-3 mb-5"><i class="lni lni-basket-shopping-3 mr-2"></i> Ordine #{{ order.id }}</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div>
+                {% for category, message in messages %}
+                    <div class="notification is-{{ category }} mb-2">
+                    {{ message }}
+                    </div>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Cart -->
+        <div class="box">
+            <h2 class="title is-5 mb-4">
+                <i class="lni lni-cart"></i>
+                {{ _('Prodotti acquistati') }}
+            </h2>
+            
+            {% for identifier in products %}
+                {% set variant = products[identifier]['variant'] %}
+                {% set product = products[identifier]['product'] %}
+                {% set price = prices[identifier]['total_price'] %}
+                
+                <div class="columns is-vcentered is-mobile mb-4 pb-4" style="border-bottom: 1px solid #e8e8e8;">
+                <!-- Immagine prodotto -->
+                <div class="column is-narrow">
+                    <figure class="image is-96x96" style="height: fit-content;">
+                    <img
+                        src="{{ variant.first_image()['path'] }}"
+                        alt="{{ product.name['it'] }}"
+                        style="object-fit: cover; border-radius: 6px;"
+                    >
+                    </figure>
+                </div>
+                
+                <!-- Dettagli prodotto -->
+                <div class="column">
+                    <p class="has-text-weight-semibold mb-2">
+                    {{ product.name['it'] }} - {{ variant.name['it'] }}
+                    {% if variant.option %}
+                    - {{variant.options[variant.option]['name']['it']}}
+                    {% endif %}
+                    </p>
+                    
+                    <div class="is-size-7 has-text-grey mb-2">
+                    {{ _('Prezzo unitario') }}: {{ format_money(variant.get_float_price_for_currency(order.currency, 1, variant.option), order.currency, session['lang']) }}
+                    </div>
+                    
+                    <div class="is-size-7 has-text-grey mb-2">
+                    {{ _('Quantità') }}: {{ products[identifier].quantity }}
+                    </div>
+                    
+                    <p class="has-text-weight-bold has-text-success">
+                    {{ _('Totale') }}: {{ format_money(price, order.currency, session['lang']) }}
+                    </p>
+                </div>
+            </div>
+        {% endfor %}
+        
+        <!-- Totale ordine -->
+        <div class="has-text-right pt-4" style="border-top: 2px solid #ddd;">
+            <p class="title is-4 has-text-primary">
+            {{ _('Totale Ordine') }}: {{ order.get_total(session['lang']) }}
+            </p>
+        </div>
+        </div>
+
+        <!-- Billing and Shipping -->
+        <div class="columns is-multiline mt-5">
+            <!-- Billing Address -->
+            <div class="column is-6">
+                <div class="card">
+                    <header class="card-header">
+                        <p class="card-header-title">{{ _('Informazioni di Fatturazione') }}</p>
+                    </header>
+                    <div class="card-content">
+                        <address>
+                            <p>{{ order.checkout['billing_name'] }} {{ order.checkout['billing_lastname'] }}</p>
+                            <p>{{ order.checkout['billing_street'] }}, {{ order.checkout['billing_number'] }}</p>
+                            <p>{{ order.checkout['billing_postal_code'] }} {{ order.checkout['billing_city'] }}</p>
+                            <p>{{ order.checkout['billing_email'] }}</p>
+                            <p>{{ order.checkout['billing_phone'] }}</p>
+                            {% if order.checkout['billing_fiscal_code'] %}
+                                <p><strong>{{ _('Codice Fiscale') }}:</strong> {{ order.checkout['billing_fiscal_code'] }}</p>
+                            {% endif %}
+                        </address>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipping Address -->
+            <div class="column is-6">
+                <div class="card">
+                    <header class="card-header">
+                        <p class="card-header-title">{{ _('Informazioni di Spedizione') }}</p>
+                    </header>
+                    <div class="card-content">
+                        <address>
+                            <p>{{ order.checkout['shipping_name'] }} {{ order.checkout['shipping_lastname'] }}</p>
+                            <p>{{ order.checkout['shipping_street'] }} {{ order.checkout['shipping_number'] }}</p>
+                            <p>{{ order.checkout['shipping_postal_code'] }} {{ order.checkout['shipping_city'] }}</p>
+                            <p>{{ order.checkout['shipping_region'] }}, {{ order.checkout['shipping_country'] }}</p>
+                            <hr>
+                            <p class="mt-2 border">
+                                <b>Note di spedizione:</b><br>
+                                {{order.checkout['shipping_notes']}}
+                            </p>
+                        </address>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Status Form -->
+        <form id="order" static="true" method="POST" action="/admin/order/{{ order.id }}/update" enctype="multipart/form-data" class="mt-5">
+            <div class="field is-grouped is-align-items-center">
+                <div class="control">
+                    <label class="label">{{ _('Stato ordine') }}</label>
+                    <div class="select">
+                        <select id="status" name="status">
+                            {% for s in status %}
+                                <option value="{{ s.value }}" {% if s == order.status %}selected{% endif %}>{{ status_translate[s] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="control">
+                    <label class="label">{{ _('Pagato') }}</label>
+                    <div class="select">
+                        <select id="payed" name="payed">
+                            <option value="true" {% if order.payed %}selected{% endif %}>Sì</option>
+                            <option value="false" {% if not order.payed %}selected{% endif %}>No</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="control mt-5 mt-0-tablet ml-4">
+                    <input type="submit" class="button is-primary" value="{{ _('Salva') }}">
+                    <button type="button" onclick="fetchInvoice({{order.id}})" class="button is-success">{{_('Scarica la fattura')}}</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{% include 'admin/views/orders/javascript.html' %}
+{% endblock %}

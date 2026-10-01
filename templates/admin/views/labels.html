@@ -1,0 +1,232 @@
+
+{% extends "admin/base.html" %}
+
+{% block title %}Marche{% endblock %}
+
+{% block content %}
+<style>
+    .search {
+        position: absolute;
+        top: 11px;
+        right: 10px;
+        cursor: pointer;
+    }
+
+    .row {
+        display: flex;
+    }
+
+</style>
+
+<div class="container">
+    <div class="level mb-4">
+        <div class="level-left">
+            <div class="level-item">
+                <h1 class="title">
+                    <span class="icon-text">
+                        <span class="icon">
+                            <i class="lni lni-label-dollar-2"></i>
+                        </span>
+                        <span>Marche</span>
+                    </span>
+                </h1>
+            </div>
+        </div>
+        <div class="level-center">
+            <div class="level-item" style="position: relative;">
+                <input id="search" class="input" type="text" placeholder="Cerca...">
+                <i id="search-icon" class="lni lni-search-1 lni-lg search"></i>  
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <div class="select mr-2">
+                    <select id="per_page">
+                        <option value="10">10 per pagina</option>
+                        <option value="25">25 per pagina</option>
+                        <option value="50">50 per pagina</option>
+                    </select>
+                </div>
+                <a class="button is-primary" href="{{url_for('labels.create')}}">
+                    <span class="icon">
+                        <i class="lni lni-plus"></i>
+                    </span>
+                    <span>Crea marca</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="labels"></div>
+    
+    <nav class="pagination is-centered mt-4" role="navigation" aria-label="pagination">
+        <ul class="pagination-list" id="pagination"></ul>
+    </nav>
+
+    <!--Confirm modal-->
+    {% set modal_title = 'Crea marca' %}
+    {% set modal_id = 'confirm-delete-modal'%}
+    {% set modal_body = '
+        <p>Sei sicuro di voler cancellare l\'elemento?</p>
+    '%}
+    {% set modal_footer = '
+        <button id="confirm-delete-btn" class="button is-success">Conferma</button>
+        <button class="button" trigger="modal" modal="#confirm-delete-modal" type="button">Annulla</button>
+    '%}
+    {% include "shared/modal.html" %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentPage = 1;
+let input = document.getElementById("search");
+let icon = document.getElementById("search-icon");
+
+
+function restoreSearch() {
+    input.value = "";
+    icon.classList.remove("lni-xmark");
+    icon.classList.add("lni-search-1");
+    icon.onclick = () => {search();}
+    reloadLabelsTable();
+}
+
+function search() {
+    icon.classList.remove("lni-search-1")
+    icon.classList.add("lni-xmark")
+    icon.onclick = () => {restoreSearch();};
+    reloadLabelsTable(1, input.value);
+}
+
+function showConfirmDelete(id) {
+    openModal('confirm-delete-modal')
+    document.getElementById('confirm-delete-btn').setAttribute('onclick', `deleteLabel("${id}")`);
+}
+
+async function  deleteLabel(id) {
+    response = await fetch(`/admin/labels/${id}/delete`, {
+        method: "DELETE"
+    })
+    if (response.status == 200) {
+        window.notyf.success('Prodotto eliminato correttamente');
+        closeModal('confirm-delete-modal')
+    } else {
+        window.notyf.error('Un errore ha impedito la cancellazione della marca')
+    }
+    reloadLabelsTable();
+}
+
+async function reloadLabelsTable(page = 1, search = "") {
+    currentPage = page;
+    const perPage = document.getElementById('per_page').value;
+    
+    response = await fetch(`/admin/labels/list?page=${page}&per_page=${perPage}&search=${search}`, {
+        method: "GET"
+    });
+
+    if (response.status == 200) {
+        const { data, pagination } = await response.json();
+        
+        if (window.labelsGrid) {
+            window.labelsGrid.destroy();
+        }
+        document.getElementById("labels").innerHTML = "";
+        
+        window.labelsGrid = new gridjs.Grid({
+            columns: [
+                {
+                    name: 'name'
+                },
+                {
+                    name: 'id',
+                    label: 'Azioni',
+                    formatter: ((cell, row) => {
+                        const id = cell;
+                        return gridjs.html(`
+                            <a class="button is-info mr-2" href="/admin/labels/edit/${id}">
+                                <span class="icon">
+                                    <i class="lni lni-pencil-1"></i>
+                                </span>
+                                <span>Modifica</span>
+                            </a>
+                            <button class="button is-danger" onclick="showConfirmDelete(${id})">
+                                <span class="icon">
+                                    <i class="lni lni-trash-3"></i>
+                                </span>
+                                <span>Elimina</span>
+                            </button>
+                        `);
+                    })
+                }
+            ],
+            data: data
+        }).render(document.getElementById('labels'));
+        
+        // Update pagination
+        updatePagination(pagination);
+    }
+}
+
+function updatePagination(pagination) {
+    const paginationList = document.getElementById('pagination');
+    paginationList.innerHTML = '';
+    
+    // Previous page
+    if (pagination.page > 1) {
+        paginationList.innerHTML += `
+            <li>
+                <a class="pagination-link" aria-label="Goto page ${pagination.page - 1}" 
+                   onclick="reloadLabelsTable(${pagination.page - 1})">
+                    <span class="icon"><i class="lni lni-chevron-left"></i></span>
+                </a>
+            </li>
+        `;
+    }
+    
+    // Page numbers
+    for (let i = 1; i <= pagination.pages + 1; i++) {
+        if (
+            i === 1 || 
+            i === pagination.pages || 
+            (i >= pagination.page - 2 && i <= pagination.page + 2)
+        ) {
+            paginationList.innerHTML += `
+                <li>
+                    <a class="pagination-link ${i === pagination.page ? 'is-current' : ''}" 
+                       aria-label="Goto page ${i}"
+                       onclick="reloadLabelsTable(${i})">
+                        ${i}
+                    </a>
+                </li>
+            `;
+        } else if (
+            i === pagination.page - 3 || 
+            i === pagination.page + 3
+        ) {
+            paginationList.innerHTML += `
+                <li><span class="pagination-ellipsis">&hellip;</span></li>
+            `;
+        }
+    }
+    
+    // Next page
+    if (pagination.page < pagination.pages) {
+        paginationList.innerHTML += `
+            <li>
+                <a class="pagination-link" aria-label="Goto page ${pagination.page + 1}" 
+                   onclick="reloadLabelsTable(${pagination.page + 1})">
+                    <span class="icon"><i class="lni lni-chevron-left" style="transform: rotate(180deg)"></i></span>
+                </a>
+            </li>
+        `;
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    reloadLabelsTable(1);
+    document.getElementById('per_page').addEventListener('change', () => reloadLabelsTable(1));
+    icon.onclick = () => {search();};
+});
+</script>
+{% endblock %}

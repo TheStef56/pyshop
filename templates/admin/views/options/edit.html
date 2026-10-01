@@ -1,0 +1,34 @@
+<input class="option_order" form="variant" type="hidden" name="options[{{id}}][order]" value="{{option_data.order if option_data.order is not none else 0}}">
+<td>
+    <input form="variant" type="checkbox" 
+    {% if option_data['active'] %} 
+    checked="checked" 
+    {% endif %} 
+    name="options[{{id}}][active]"
+    >
+</td>
+<td>
+    <input style="max-width:60px" form="variant" type="text" name="options[{{id}}][name][it]" value="{{option_data['name']['it']}}" required>
+</td>
+<td>
+    <input style="max-width:60px" form="variant" type="text" name="options[{{id}}][name][en]" value="{{option_data['name']['en']}}">
+</td>
+<td>
+    <input style="max-width:60px" form="variant" type="number" step="0.01" name="options[{{id}}][discount][eur]" value="{{option_data['discount']['eur']}}" required>
+</td>
+<td>
+    <input style="max-width:60px" form="variant" type="number" step="0.01" name="options[{{id}}][discount][usd]" value="{{option_data['discount']['usd']}}" required>
+</td>
+<td>
+    <input style="max-width:60px" form="variant" type="number" step="0.01" name="options[{{id}}][price][eur]" value="{{option_data['price']['eur']}}" required>
+</td>
+<td>
+    <input style="max-width:60px" form="variant" type="number" step="0.01" name="options[{{id}}][price][usd]" value="{{option_data['price']['usd']}}" required>
+</td>
+<td>
+    <input style="max-width:60px" form="variant" type="number" name="options[{{id}}][stock]" value="{{option_data['stock']}}" min="0" required>
+</td>
+<td id="option_input_{{id}}">
+    <button type="button" class="button is-info is-small" onclick="cloneOption('{{ id }}')">Clona</button>
+    <button type="button" class="button is-danger is-small" onclick="deleteOption('{{ id }}')">Cancella</button>
+</td>

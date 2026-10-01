@@ -1,0 +1,133 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="container is-max-desktop">
+    <!-- Header con titolo e pulsante salva -->
+    <div class="level mb-5">
+        <div class="level-left">
+            <div class="level-item">
+                <h1 class="title is-3">
+                    <i class="lni lni-label-dollar-2"></i> Marca
+                </h1>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <input type="submit" form="settings" class="button is-primary is-medium" value="Salva Modifiche">
+            </div>
+        </div>
+    </div>
+
+    <!-- Messaggi flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="mb-4">
+        {% for category, message in messages %}
+        <div class="notification is-{{ category }} mb-2">
+            <button class="delete"></button>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+    <form static="true" id="settings" method="POST" action="{{ url_for('labels.update', id=label.id) if label.id else url_for('labels.store') }}" enctype="multipart/form-data">
+          
+        {{ form.csrf_token }}
+        {{ form.hidden_tag() }}
+
+        <!-- Sezione Informazioni Generali -->
+        <div class="box mb-5">
+            <h2 class="title is-5 has-text-primary mb-4">
+                <i class="lni lni-information"></i>
+                Informazioni Generali
+            </h2>
+
+            <div class="columns">
+                <div class="column is-full">
+                    <div class="field">
+                        <label class="label">{{ form.name.label }}</label>
+                        <div class="control has-icons-left">
+                            {{ form.name(class="input") }}
+                            <span class="icon is-small is-left">
+                                <i class="lni lni-world"></i>
+                            </span>
+                        </div>
+                        {% for error in form.name.errors %}
+                        <p class="help is-danger">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sezione Immagini -->
+            <div class="mb-2">
+                <div class="columns">
+                    <div class="column is-full">
+                        <div class="field">
+                            <label class="label">{{ form.image.label }}</label>
+                            <div class="control">
+                                <div class="file has-name is-boxed is-fullwidth">
+                                    <label class="file-label">
+                                        {{ form.image(class="file-input") }}
+                                        <span class="file-cta">
+                                            <span class="file-icon">
+                                                <i class="lni lni-upload"></i>
+                                            </span>
+                                            <span class="file-label">
+                                                Scegli immagine marca
+                                            </span>
+                                        </span>
+                                        <span class="file-name" id="image_name">
+                                            Nessun file selezionato
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            {% for error in form.image.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                            {% if label.image %}
+                            <img src="{{ url_for('static', filename=label.image) }}"  alt="Label Image" class="image is-128x128 mt-3">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Gestione dismissione notifiche
+    document.addEventListener('DOMContentLoaded', () => {
+        const deleteButtons = document.querySelectorAll('.notification .delete');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                button.parentElement.remove();
+            });
+        });
+    });
+
+    // Gestione preview immagini
+    function setupImagePreview(inputId, nameId) {
+        const input = document.getElementById(inputId);
+        const nameDisplay = document.getElementById(nameId);
+
+        if (input && nameDisplay) {
+            input.addEventListener('change', () => {
+                const file = input.files[0];
+                if (file) {
+                    nameDisplay.textContent = file.name;
+                    nameDisplay.classList.add('has-text-success');
+                } else {
+                    nameDisplay.textContent = "Nessun file selezionato";
+                    nameDisplay.classList.remove('has-text-success');
+                }
+            });
+        }
+    }
+</script>
+{% endblock %}

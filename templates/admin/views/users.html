@@ -1,0 +1,66 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Utenti{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="title"><i class="lni lni-user-4"></i> Utenti</h1>
+    <a class="button is-primary mb-2" href="{{url_for('admin_users.create')}}">Nuovo utente</a>
+    <table id="users" class="mt-4"></table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+async function reloadUsersTable() {
+    response = await fetch("/admin/users/list", {
+        method: "GET",
+    })
+    if (response.status == 200) {
+        if (window.usersGrid) {
+            window.usersGrid.destroy();
+        }
+        document.getElementById("users").innerHTML = "";
+        jsonData = await response.json()
+        window.usersGrid = new gridjs.Grid({
+            columns: [
+                {
+                    name: 'ID',
+                    id: 'id'
+                },
+                {
+                    name: 'Username',
+                    id: 'username',
+                },
+                {
+                    name: 'Attivo',
+                    id: 'is_active',
+                    formatter: (cell) => {
+                        return gridjs.html(`
+                            ${cell ? 
+                                `<span class="tag is-success">Sì</span>` : 
+                                `<span class="tag is-danger">No</span>`
+                            }
+                        `);
+                    }
+                },
+                {
+                    name: 'Azioni',
+                    formatter: (_, row) => {
+                        const id = row.cells[0].data;
+                        return gridjs.html(`
+                            <a class="button is-info mr-2" href="/admin/users/${id}/edit"><i class="lni lni-pencil-1 pr-1"></i> Modifica</a>
+                        `);
+                    }
+                }
+            ],
+            data: jsonData
+        }).render(document.getElementById('users'));
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  reloadUsersTable()
+});
+</script>
+{% endblock %}

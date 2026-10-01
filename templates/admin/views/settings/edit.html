@@ -1,0 +1,509 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="container is-max-desktop">
+    <!-- Header con titolo e pulsante salva -->
+    <div class="level mb-5">
+        <div class="level-left">
+            <div class="level-item">
+                <h1 class="title is-3">
+                    <i class="lni lni-brush-2"></i> Impostazioni del Sito
+                </h1>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <input type="submit" form="settings" class="button is-primary is-medium" value="Salva Modifiche">
+            </div>
+        </div>
+    </div>
+
+    <!-- Messaggi flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="mb-4">
+        {% for category, message in messages %}
+        <div class="notification is-{{ category }} mb-2">
+            <button class="delete"></button>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <form static="true" id="settings" method="POST" action="{{ url_for('admin_settings.update') }}"
+        enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+
+        <!-- Sezione Informazioni Generali -->
+        <div class="box mb-5">
+            <h2 class="title is-5 has-text-primary mb-4">
+                <i class="lni lni-information"></i>
+                Informazioni Generali
+            </h2>
+
+            <div class="columns">
+                <div class="column is-half">
+                    <div class="field">
+                        <label class="label">{{ form.site_name.label }}</label>
+                        <div class="control">
+                            {{ form.site_name(class="input") }}
+                            <span class="icon is-small is-left">
+                                <i class="lni lni-world"></i>
+                            </span>
+                        </div>
+                        {% for error in form.site_name.errors %}
+                        <p class="help is-danger">{{ error }}</p>>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="column is-half">
+                    <div class="field">
+                        <label class="label">{{ form.support_mail.label }}</label>
+                        <div class="control">
+                            {{ form.support_mail(class="input") }}
+                            <span class="icon is-small is-left">
+                                <i class="lni lni-envelope"></i>
+                            </span>
+                        </div>
+                        {% for error in form.support_mail.errors %}
+                        <p class="help is-danger">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="columns">
+                <div class="column is-half">
+                    <div class="field">
+                        <label class="label">{{ form.site_description.label }}</label>
+                        <div class="control">
+                            {{ form.site_description(class="input select") }}
+                            <span class="icon is-small is-left">
+                                <i class="lni lni-envelope"></i>
+                            </span>
+                            {% for error in form.site_description.errors %}
+                                <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-half">
+                    <div class="field">
+                        <label class="label">{{ form.open.label }}</label>
+                        <div class="control">
+                            {{ form.open(class="input select") }}
+                            <span class="icon is-small is-left">
+                                <i class="lni lni-envelope"></i>
+                            </span>
+                            {% for error in form.open.errors %}
+                                <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <div class="columns">
+                    <div class="column is-half">
+                        <div class="field">
+                            <label class="label">{{ form.processing_time.label }}</label>
+                            <div class="control">
+                                {{ form.processing_time(class="input select") }}
+                                <span class="icon is-small is-left">
+                                    <i class="lni lni-envelope"></i>
+                                </span>
+                                {% for error in form.processing_time.errors %}
+                                <p class="help is-danger">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Sezione contatti-->
+            <div class="box mb-5">
+                <h2 class="title is-5 has-text-primary mb-4">
+                    <i class="lni lni-message-2"></i>
+                    Contatti
+                </h2>
+
+                <div class="columns">
+                    <div class="column is-3">
+                        <div class="field">
+                            <label class="label">{{ form.contact_whatsapp.label }}</label>
+                            <div class="control has-icons-left">
+                                {{ form.contact_whatsapp(class="input") }}
+                                <span class="icon is-small is-left">
+                                    <i class="lni lni-whatsapp"></i>
+                                </span>
+                            </div>
+                            {% for error in form.contact_whatsapp.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="column is-3">
+                        <div class="field">
+                            <label class="label">{{ form.contact_phone.label }}</label>
+                            <div class="control has-icons-left">
+                                {{ form.contact_phone(class="input") }}
+                                <span class="icon is-small is-left">
+                                    <i class="lni lni-phone"></i>
+                                </span>
+                            </div>
+                            {% for error in form.contact_phone.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="column is-3">
+                        <div class="field">
+                            <label class="label">{{ form.contact_instagram.label }}</label>
+                            <div class="control has-icons-left">
+                                {{ form.contact_instagram(class="input") }}
+                                <span class="icon is-small is-left">
+                                    <i class="lni lni-instagram"></i>
+                                </span>
+                            </div>
+                            {% for error in form.contact_instagram.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="column is-3">
+                        <div class="field">
+                            <label class="label">{{ form.contact_facebook.label }}</label>
+                            <div class="control has-icons-left">
+                                {{ form.contact_facebook(class="input") }}
+                                <span class="icon is-small is-left">
+                                    <i class="lni lni-facebook"></i>
+                                </span>
+                            </div>
+                            {% for error in form.contact_facebook.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="columns">
+                    <div class="column is-3">
+                        <div class="field">
+                            <label class="label">{{ form.contact_mail.label }}</label>
+                            <div class="control has-icons-left">
+                                {{ form.contact_mail(class="input") }}
+                                <span class="icon is-small is-left">
+                                    <i class="lni lni-envelope-1"></i>
+                                </span>
+                            </div>
+                            {% for error in form.contact_mail.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sezione Social Media -->
+            <div class="box mb-5">
+                <h2 class="title is-5 has-text-primary mb-4">
+                    <i class="lni lni-share"></i>
+                    Social Media
+                </h2>
+
+                <div class="columns">
+                    <div class="column">
+                        <div class="field">
+                            <label class="label">{{ form.tiktok_profile_url.label }}</label>
+                            <div class="control has-icons-left">
+                                {{ form.tiktok_profile_url(class="input") }}
+                                <span class="icon is-small is-left">
+                                    <i class="lni lni-tiktok"></i>
+                                </span>
+                            </div>
+                            {% for error in form.tiktok_profile_url.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="column">
+                        <div class="field">
+                            <label class="label">{{ form.instagram_profile_url.label }}</label>
+                            <div class="control has-icons-left">
+                                {{ form.instagram_profile_url(class="input") }}
+                                <span class="icon is-small is-left">
+                                    <i class="lni lni-instagram"></i>
+                                </span>
+                            </div>
+                            {% for error in form.instagram_profile_url.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="column">
+                        <div class="field">
+                            <label class="label">{{ form.youtube_profile_url.label }}</label>
+                            <div class="control has-icons-left">
+                                {{ form.youtube_profile_url(class="input") }}
+                                <span class="icon is-small is-left">
+                                    <i class="lni lni-youtube"></i>
+                                </span>
+                            </div>
+                            {% for error in form.youtube_profile_url.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sezione Immagini -->
+            <div class="box mb-5">
+                <h2 class="title is-5 has-text-primary mb-4">
+                    <i class="lni lni-image"></i>
+                    Immagini del Sito
+                </h2>
+
+                <div class="columns">
+                    <div class="column is-half">
+                        <div class="field">
+                            <label class="label">{{ form.header_image.label }}</label>
+                            <div class="control">
+                                <div class="file has-name is-boxed is-fullwidth">
+                                    <label class="file-label">
+                                        {{ form.header_image(class="file-input") }}
+                                        <span class="file-cta">
+                                            <span class="file-icon">
+                                                <i class="lni lni-upload"></i>
+                                            </span>
+                                            <span class="file-label">
+                                                Scegli immagine header
+                                            </span>
+                                        </span>
+                                        <span class="file-name" id="header_image_name">
+                                            Nessun file selezionato
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            {% for error in form.header_image.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                            {% if header_settings %}
+                            <img src="{{ url_for('static', filename=header_settings.meta.get('header', '')) }}"
+                                alt="Header Image" class="image mb-4">
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="column is-half">
+                        <div class="field">
+                            <label class="label">{{ form.logo_image.label }}</label>
+                            <div class="control">
+                                <div class="file has-name is-boxed is-fullwidth">
+                                    <label class="file-label">
+                                        {{ form.logo_image(class="file-input") }}
+                                        <span class="file-cta">
+                                            <span class="file-icon">
+                                                <i class="lni lni-upload"></i>
+                                            </span>
+                                            <span class="file-label">
+                                                Scegli logo
+                                            </span>
+                                        </span>
+                                        <span class="file-name" id="logo_image_name">
+                                            Nessun file selezionato
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            {% for error in form.logo_image.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                            {% if header_settings %}
+                            <img src="{{ url_for('static', filename=header_settings.meta.get('logo', '')) }}"
+                                alt="Header Image" class="image mb-4">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="columns">
+                    <div class="column is-one-third">
+                    <div class="field">
+                        <label class="label">{{ form.favicon_image.label }}</label>
+                        <div class="control">
+                            <div class="file has-name is-boxed is-fullwidth">
+                                <label class="file-label">
+                                    {{ form.favicon_image(class="file-input") }}
+                                    <span class="file-cta">
+                                        <span class="file-icon">
+                                            <i class="lni lni-upload"></i>
+                                        </span>
+                                        <span class="file-label">
+                                            Scegli favicon
+                                        </span>
+                                    </span>
+                                    <span class="file-name" id="favicon_name">
+                                        Nessun file selezionato
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                        {% for error in form.favicon_image.errors %}
+                        <p class="help is-danger">{{ error }}</p>
+                        {% endfor %}
+                        {% if header_settings %}
+                        <img src="{{ url_for('static', filename=header_settings.meta.get('favicon', '')) }}"
+                            alt="Header Image" class="image mb-4">
+                        {% endif %}
+                    </div>
+                </div>
+                    <div class="column is-one-third">
+                        <div class="field">
+                            <label class="label">{{ form.homepage_it_image.label }}</label>
+                            <div class="control">
+                                <div class="file has-name is-boxed is-fullwidth">
+                                    <label class="file-label">
+                                        {{ form.homepage_it_image(class="file-input") }}
+                                        <span class="file-cta">
+                                            <span class="file-icon">
+                                                <i class="lni lni-upload"></i>
+                                            </span>
+                                            <span class="file-label">
+                                                Scegli immagine homepage IT
+                                            </span>
+                                        </span>
+                                        <span class="file-name" id="homepage_it_image_name">
+                                            Nessun file selezionato
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            {% for error in form.header_image.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                            {% if global_settings %}
+                            <img src="{{ url_for('static', filename=global_settings.meta.get('homepage_it_image', '')) }}"
+                                alt="Immagine homepage IT" class="image mb-4">
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="column is-one-third">
+                        <div class="field">
+                            <label class="label">{{ form.homepage_en_image.label }}</label>
+                            <div class="control">
+                                <div class="file has-name is-boxed is-fullwidth">
+                                    <label class="file-label">
+                                        {{ form.homepage_en_image(class="file-input") }}
+                                        <span class="file-cta">
+                                            <span class="file-icon">
+                                                <i class="lni lni-upload"></i>
+                                            </span>
+                                            <span class="file-label">
+                                                Scegli immagine homepage ENG
+                                            </span>
+                                        </span>
+                                        <span class="file-name" id="homepage_en_image_name">
+                                            Nessun file selezionato
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            {% for error in form.header_image.errors %}
+                            <p class="help is-danger">{{ error }}</p>
+                            {% endfor %}
+                            {% if global_settings %}
+                            <img src="{{ url_for('static', filename=global_settings.meta.get('homepage_en_image', '')) }}"
+                                alt="Immagine homepage ENG" class="image mb-4">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sezione Privacy Policy -->
+            <div class="box mb-5">
+                <h2 class="title is-5 has-text-primary mb-4">
+                    <i class="lni lni-shield"></i>
+                    Privacy Policy
+                </h2>
+
+                <div class="columns">
+                    <div class="column is-half">
+                        <div class="field">
+                            <label class="label is-flex is-justify-content-space-between">
+                                {{ form.privacy_policy_it.label }}
+                                <button type="button"  onclick="autoTranslate(`[name='privacy_policy_it']`,`[name='privacy_policy_en']`, 'it', 'en')" class="button is-small"><i class="lni lni-refresh-circle-1-clockwise"></i> Traduci</button>
+                            </label>
+                            <div class="control">
+                                <div id="editor_it" class="pell" style="min-height: 200px;"></div>
+                                <input type="hidden" name="privacy_policy_it" id="privacy_policy_it">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="column is-half">
+                        <div class="field">
+                            <label class="label is-flex is-justify-content-space-between">
+                                {{ form.privacy_policy_en.label }}
+                                <button type="button"  onclick="autoTranslate(`[name='privacy_policy_en']`,`[name='privacy_policy_it']`, 'en', 'it')" class="button is-small"><i class="lni lni-refresh-circle-1-clockwise"></i> Traduci</button>
+                            </label>
+                            <div class="control">
+                                <div id="editor_eng" class="pell" style="min-height: 200px;"></div>
+                                <input type="hidden" name="privacy_policy_en" id="privacy_policy_en">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Gestione dismissione notifiche
+    document.addEventListener('DOMContentLoaded', () => {
+        const deleteButtons = document.querySelectorAll('.notification .delete');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                button.parentElement.remove();
+            });
+        });
+    });
+
+    // Gestione preview immagini
+    function setupImagePreview(inputId, nameId) {
+        const input = document.getElementById(inputId);
+        const nameDisplay = document.getElementById(nameId);
+
+        if (input && nameDisplay) {
+            input.addEventListener('change', () => {
+                const file = input.files[0];
+                if (file) {
+                    nameDisplay.textContent = file.name;
+                    nameDisplay.classList.add('has-text-success');
+                } else {
+                    nameDisplay.textContent = "Nessun file selezionato";
+                    nameDisplay.classList.remove('has-text-success');
+                }
+            });
+        }
+    }
+
+    // Inizializzazione al caricamento della pagina
+    document.addEventListener('DOMContentLoaded', () => {
+        setupImagePreview('header_image', 'header_image_name');
+        setupImagePreview('logo_image', 'logo_image_name');
+
+        initPell('editor_it', 'privacy_policy_it', `{{ form.privacy_policy_it.data|safe }}`);
+        initPell('editor_eng', 'privacy_policy_en', `{{ form.privacy_policy_en.data|safe }}`);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,18 @@
+<div class="modal {% if modal_active %}is-active{% endif %}" id="{{ modal_id|default('shared-modal') }}">
+    <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+            <p class="modal-card-title">
+                {{ modal_title|default('Titolo Modal') }}
+            </p>
+            <button class="delete" aria-label="close" trigger="modal" modal="#{{ modal_id|default('shared-modal') }}" id="{{ modal_id|default('shared-modal') }}-close"></button>
+            </header>
+            <section class="modal-card-body">
+            {{ modal_body|safe }}
+            </section>
+            <footer class="modal-card-foot">
+            {{ modal_footer|safe }}
+            </footer>
+        </div>
+    </div>
+</div>

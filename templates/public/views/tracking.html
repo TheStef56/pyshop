@@ -1,0 +1,102 @@
+{% extends "public/base.html" %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="title has-text-centered">
+      <span class="icon-text">
+        <span class="icon">
+          <i class="fas fa-truck"></i>
+        </span>
+        <span>{{ _('Shipment tracking') }}</span>
+      </span>
+    </h1>
+
+    {% if error %}
+    <div class="notification is-danger">
+      <button class="delete"></button>
+      {{ error }}
+    </div>
+    {% endif %}
+
+    {% if result %}
+    <div class="timeline is-centered mt-6">
+      {% for entry in result["history"] %}
+      <div class="timeline-item">
+        <div class="timeline-marker {% if loop.first %}is-success{% elif loop.last %}is-danger{% else %}is-info{% endif %}">
+          {% if loop.first %}
+          <span class="icon">
+            <i class="fas fa-check"></i>
+          </span>
+          {% endif %}
+        </div>
+        <div class="timeline-content">
+          <div class="box">
+            <p class="heading has-text-weight-bold">
+              {{ entry["timestamp"] }}
+            </p>
+            <div class="content">
+              <p>
+                <span class="icon-text">
+                  <span class="icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                  </span>
+                  <span class="has-text-weight-semibold">{{ entry["city"] }}</span>
+                </span>
+              </p>
+              <p>{{ entry["description"] }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="notification is-warning">
+      <p class="has-text-centered">Nessun dato di tracking disponibile</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+.timeline {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.timeline-item {
+  padding: 1rem 0;
+}
+
+.timeline-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: #dbdbdb;
+}
+
+.timeline-marker.is-success {
+  background: #48c774;
+}
+
+.timeline-marker.is-info {
+  background: #3298dc;
+}
+
+.timeline-marker.is-danger {
+  background: #f14668;
+}
+
+.timeline-content {
+  padding: 0 1rem;
+}
+
+.box {
+  margin-bottom: 0;
+}
+</style>
+{% endblock %}

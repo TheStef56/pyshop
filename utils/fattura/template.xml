@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<p:FatturaElettronica versione="FPR12" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2 fatturaordinaria_v1.2.xsd" xmlns:p="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2">
+  <FatturaElettronicaHeader>
+    <DatiTrasmissione>
+      <IdTrasmittente>
+        <IdPaese>IT</IdPaese>
+        <IdCodice>SNSNTN67A17I066S</IdCodice>
+      </IdTrasmittente>
+      <ProgressivoInvio></ProgressivoInvio>
+      <FormatoTrasmissione>FPR12</FormatoTrasmissione>
+      <CodiceDestinatario>0000000</CodiceDestinatario>
+      <ContattiTrasmittente>
+        <Telefono>0831664780</Telefono>
+        <Email>info@pubblisystemsanasi.it</Email>
+      </ContattiTrasmittente>
+    </DatiTrasmissione>
+    <CedentePrestatore>
+      <DatiAnagrafici>
+        <IdFiscaleIVA>
+          <IdPaese>IT</IdPaese>
+          <IdCodice>01570500742</IdCodice>
+        </IdFiscaleIVA>
+        <CodiceFiscale>SNSNTN67A17I066S</CodiceFiscale>
+        <Anagrafica>
+          <Denominazione>PUBBLISYSTEM </Denominazione>
+        </Anagrafica>
+        <RegimeFiscale>RF01</RegimeFiscale>
+      </DatiAnagrafici>
+      <Sede>
+        <Indirizzo>VIA FLEMING, 15</Indirizzo>
+        <CAP>72026</CAP>
+        <Comune>SAN PANCRAZIO SALENTINO</Comune>
+        <Nazione>IT</Nazione>
+      </Sede>
+      <Contatti>
+        <Telefono>0831664780</Telefono>
+        <Fax>0831664780</Fax>
+        <Email>info@pubblisystemsanasi.it</Email>
+      </Contatti>
+    </CedentePrestatore>
+    <CessionarioCommittente>
+      <DatiAnagrafici>
+        <CodiceFiscale></CodiceFiscale> <!-- CODICE FISCALE CLIENTE -->
+        <Anagrafica>
+        </Anagrafica>
+      </DatiAnagrafici>
+      <Sede>
+        <Indirizzo></Indirizzo> <!-- VIA -->
+        <NumeroCivico></NumeroCivico> <!-- NUMERO -->
+        <CAP></CAP> <!-- CAP -->
+        <Comune></Comune> <!-- COMUNE -->
+        <Provincia></Provincia> <!-- PROVINCIA -->
+        <Nazione></Nazione> <!-- NAZIONE (IT) -->
+      </Sede>
+    </CessionarioCommittente>
+  </FatturaElettronicaHeader>
+  <FatturaElettronicaBody>
+    <DatiGenerali>
+      <DatiGeneraliDocumento>
+        <TipoDocumento>TD01</TipoDocumento>
+        <Divisa></Divisa>
+        <Data></Data> <!-- ANNO-MESE-GIORNO -->
+        <Numero>1</Numero>
+        <ImportoTotaleDocumento></ImportoTotaleDocumento> <!-- TOTALE PAGAMENTO --> 
+        <Arrotondamento>0.00</Arrotondamento>
+        <Causale>VENDITA</Causale>
+      </DatiGeneraliDocumento>
+    </DatiGenerali>
+    <DatiBeniServizi>
+    <!-- DETTAGLIO LINEE -->
+      <DatiRiepilogo>
+        <AliquotaIVA></AliquotaIVA>
+        <ImponibileImporto></ImponibileImporto>
+        <Imposta></Imposta>
+      </DatiRiepilogo>
+    </DatiBeniServizi>
+    <DatiPagamento>
+      <CondizioniPagamento>TP02</CondizioniPagamento>
+      <DettaglioPagamento>
+        <ModalitaPagamento>MP08</ModalitaPagamento>
+        <DataRiferimentoTerminiPagamento></DataRiferimentoTerminiPagamento>
+        <GiorniTerminiPagamento>0</GiorniTerminiPagamento>
+        <DataScadenzaPagamento></DataScadenzaPagamento> <!-- ANNO-MESE-GIORNO -->
+        <ImportoPagamento></ImportoPagamento> <!-- TOTALE PAGAMENTO -->
+      </DettaglioPagamento>
+    </DatiPagamento>
+  </FatturaElettronicaBody>
+</p:FatturaElettronica>
